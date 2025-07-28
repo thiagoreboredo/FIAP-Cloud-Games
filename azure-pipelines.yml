@@ -1,6 +1,6 @@
 # Define o gatilho (trigger) da pipeline. Ela será executada a cada commit na branch 'main'.
 trigger:
-- main
+- master
 
 # Define o ambiente de execução da pipeline. Vamos utilizar inicialmente um self-hosted.
 pool: 'Default'
