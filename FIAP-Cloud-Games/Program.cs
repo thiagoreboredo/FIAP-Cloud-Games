@@ -117,8 +117,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 #region Map endpoints
-app.MapPessoaEndpoint();
-app.MapJogoEndpoint();
+app.MapPersonEndpoints();
+app.MapGameEndpoints();
 #endregion
 
 #region Middleware

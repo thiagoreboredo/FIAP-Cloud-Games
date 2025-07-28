@@ -1,16 +1,12 @@
 ﻿using Application.DTOs;
 using Application.Exceptions;
-using Application.Helper;
+using Application.Helper; // Adicionado
 using Application.Services;
 using AutoMapper;
 using Domain.Entity;
 using Domain.Repository;
-using Infrastructure.Middleware;
-using Infrastructure.Repository;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Moq;
-using System.Threading.Tasks;
 
 namespace FIAP_Cloud_GamesTest.Services
 {
@@ -18,9 +14,8 @@ namespace FIAP_Cloud_GamesTest.Services
     {
         private readonly Mock<IPessoaRepository> _pessoaRepositoryMock = new();
         private readonly Mock<IMapper> _mapperMock = new();
-        private readonly Mock<IConfiguration> _configurationMock = new(); 
-        private readonly Mock<ILogger<PessoaService>> _loggerMock = new();
-        private readonly Mock<ICorrelationIdGenerator> _correlationIdMock = new();
+        private readonly Mock<IConfiguration> _configurationMock = new();
+        private readonly Mock<IAppLogger<PessoaService>> _appLoggerMock = new();
 
         private PessoaService CreateService()
         {
@@ -28,7 +23,7 @@ namespace FIAP_Cloud_GamesTest.Services
                 _pessoaRepositoryMock.Object,
                 _mapperMock.Object,
                 _configurationMock.Object,
-                new BaseLogger<PessoaService>(_loggerMock.Object, _correlationIdMock.Object)
+                _appLoggerMock.Object
             );
         }
 
@@ -40,8 +35,8 @@ namespace FIAP_Cloud_GamesTest.Services
             var pessoaDTO = new PessoaDTO
             {
                 Email = "test@test.com",
-                Senha = "Senha!123",
-                Nome = "Teste"
+                Password = "Senha!123",
+                Name = "Teste"
             };
 
             _mapperMock
@@ -49,10 +44,10 @@ namespace FIAP_Cloud_GamesTest.Services
                 .Returns(new Pessoa());
 
             // Act
-            await service.AddPessoa(pessoaDTO);
+            await service.AddPersonAsync(pessoaDTO);
 
             // Assert
-            _pessoaRepositoryMock.Verify(r => r.Add(It.IsAny<Pessoa>()), Times.Once);
+            _pessoaRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Pessoa>()), Times.Once);
         }
 
         [Fact]
@@ -64,8 +59,8 @@ namespace FIAP_Cloud_GamesTest.Services
             var pessoaDTO = new PessoaDTO
             {
                 Email = "",
-                Senha = "",
-                Nome = ""
+                Password = "",
+                Name = ""
             };
 
             _mapperMock
@@ -73,7 +68,7 @@ namespace FIAP_Cloud_GamesTest.Services
                 .Returns(new Pessoa());
 
             // Act
-            var exception = await Assert.ThrowsAsync<BadDataException>(() => service.AddPessoa(pessoaDTO));
+            var exception = await Assert.ThrowsAsync<BadDataException>(() => service.AddPersonAsync(pessoaDTO));
 
             // Assert
             Assert.Contains("Nome não pode ser nulo. Email não pode ser nulo. Senha não pode ser nulo.", exception.Message);
@@ -91,8 +86,8 @@ namespace FIAP_Cloud_GamesTest.Services
             var pessoaDTO = new PessoaDTO
             {
                 Email = "test@test.com",
-                Senha = senhaInvalida,
-                Nome = "Test"
+                Password = senhaInvalida,
+                Name = "Test"
             };
 
             _mapperMock
@@ -100,7 +95,7 @@ namespace FIAP_Cloud_GamesTest.Services
                 .Returns(new Pessoa());
 
             // Act
-            var exception = await Assert.ThrowsAsync<BadDataException>(() => service.AddPessoa(pessoaDTO));
+            var exception = await Assert.ThrowsAsync<BadDataException>(() => service.AddPersonAsync(pessoaDTO));
 
             // Assert
             Assert.Contains("Senha deve conter no mínimo de 8 caracteres com números, letras e caracteres especiais.", exception.Message);
@@ -113,15 +108,15 @@ namespace FIAP_Cloud_GamesTest.Services
             var service = CreateService();
             int id = 1;
             Pessoa pessoa = new Pessoa() { Id = id, IsActive = false };
-            _pessoaRepositoryMock.Setup(r => r.GetById(id)).ReturnsAsync(pessoa);
+            _pessoaRepositoryMock.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(pessoa);
 
 
             // Act
-            await service.ReactivatePessoaById(id);
+            await service.ReactivatePersonByIdAsync(id);
 
             // Assert
             Assert.True(pessoa.IsActive);
-            _pessoaRepositoryMock.Verify(r => r.Update(It.IsAny<Pessoa>()), Times.Once);
+            _pessoaRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Pessoa>()), Times.Once);
         }
 
         [Fact]
@@ -130,11 +125,11 @@ namespace FIAP_Cloud_GamesTest.Services
             // Arrange
             var service = CreateService();
             int id = 1;
-            _pessoaRepositoryMock.Setup(r => r.GetById(id)).ReturnsAsync((Pessoa) null);
+            _pessoaRepositoryMock.Setup(r => r.GetByIdAsync(id)).ReturnsAsync((Pessoa) null);
 
 
             // Act
-            var exception = await Assert.ThrowsAsync<NotFoundException>(() => service.ReactivatePessoaById(id));
+            var exception = await Assert.ThrowsAsync<NotFoundException>(() => service.ReactivatePersonByIdAsync(id));
 
             // Assert
             Assert.Contains($"Não existe pessoa com Id: {id}", exception.Message);
@@ -145,17 +140,17 @@ namespace FIAP_Cloud_GamesTest.Services
         {
             // Arrange
             var service = CreateService();
-            LoginDTO loginDTO = new LoginDTO() { Email = "test@test.com", Senha = "Senha@123" };
+            LoginDTO loginDTO = new LoginDTO() { Email = "test@test.com", Password = "Senha@123" };
             _configurationMock.Setup(c => c["Jwt:SecretKey"]).Returns("12345678901234567890123456789012");
             _configurationMock.Setup(c => c["Jwt:Issuer"]).Returns("IssuerTest");
             _configurationMock.Setup(c => c["Jwt:ExpiresInMinutes"]).Returns("60");
 
             _pessoaRepositoryMock
-                .Setup(r => r.GetPessoaByEmailESenha(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(new Pessoa() { Email = loginDTO.Email, Senha = loginDTO.Senha, IsActive = true });
+                .Setup(r => r.GetByEmailAndPasswordAsync(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new Pessoa() { Email = loginDTO.Email, Senha = loginDTO.Password, IsActive = true });
 
             // Act
-            var result = await service.Login(loginDTO);
+            var result = await service.LoginAsync(loginDTO);
 
             // Assert
             Assert.Equal(loginDTO.Email, result.Email);
@@ -167,14 +162,14 @@ namespace FIAP_Cloud_GamesTest.Services
         {
             // Arrange
             var service = CreateService();
-            LoginDTO loginDTO = new LoginDTO() { Email = "test@test.com", Senha = "Senha@123" };
+            LoginDTO loginDTO = new LoginDTO() { Email = "test@test.com", Password = "Senha@123" };
 
             _pessoaRepositoryMock
-                .Setup(r => r.GetPessoaByEmailESenha(It.IsAny<string>(), It.IsAny<string>()))
+                .Setup(r => r.GetByEmailAndPasswordAsync(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync((Pessoa) null);
 
             // Act
-            var exception = await Assert.ThrowsAsync<NotFoundException>(() => service.Login(loginDTO));
+            var exception = await Assert.ThrowsAsync<NotFoundException>(() => service.LoginAsync(loginDTO));
 
             // Assert
             Assert.Contains($"Email ou senha inválidos", exception.Message);
@@ -185,14 +180,14 @@ namespace FIAP_Cloud_GamesTest.Services
         {
             // Arrange
             var service = CreateService();
-            LoginDTO loginDTO = new LoginDTO() { Email = "test@test.com", Senha = "Senha@123" };
+            LoginDTO loginDTO = new LoginDTO() { Email = "test@test.com", Password = "Senha@123" };
 
             _pessoaRepositoryMock
-                .Setup(r => r.GetPessoaByEmailESenha(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(new Pessoa() { Email = loginDTO.Email, Senha = loginDTO.Senha, IsActive = false });
+                .Setup(r => r.GetByEmailAndPasswordAsync(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new Pessoa() { Email = loginDTO.Email, Senha = loginDTO.Password, IsActive = false });
 
             // Act
-            var exception = await Assert.ThrowsAsync<BadDataException>(() => service.Login(loginDTO));
+            var exception = await Assert.ThrowsAsync<BadDataException>(() => service.LoginAsync(loginDTO));
 
             // Assert
             Assert.Contains($"Conta inativa.", exception.Message);

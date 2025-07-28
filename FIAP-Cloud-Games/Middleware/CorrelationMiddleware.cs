@@ -8,10 +8,10 @@ namespace FIAP_Cloud_Games.Middleware
     public class CorrelationMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly BaseLogger<CorrelationMiddleware> _logger;
+        private readonly IAppLogger<CorrelationMiddleware> _logger;
         private const string _correlationIdHeader = "x-correlation-id";
 
-        public CorrelationMiddleware(RequestDelegate next, BaseLogger<CorrelationMiddleware> logger)
+        public CorrelationMiddleware(RequestDelegate next, IAppLogger<CorrelationMiddleware> logger)
         {
             _next = next;
             _logger = logger;

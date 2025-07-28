@@ -29,36 +29,36 @@ namespace Application.Services
             _logger = logger;
         }
 
-        public async Task AddPessoa(PessoaDTO pessoaDTO)
+        public async Task AddPersonAsync(PessoaDTO pessoaDTO)
         {
             _logger.LogInformation($"Adicionando nova pessoa.");
 
             ValidatePessoa(pessoaDTO);
-            pessoaDTO.Senha = GenerateGuidFromSenha(pessoaDTO.Senha);
+            pessoaDTO.Password = HashPassword(pessoaDTO.Password);
             var pessoaToAdd = _mapper.Map<Pessoa>(pessoaDTO);
-            await _pessoaRepository.Add(pessoaToAdd);
+            await _pessoaRepository.AddAsync(pessoaToAdd);
 
             _logger.LogInformation($"Nova pessoa adicionada.");
         }
 
-        public async Task ReactivatePessoaById(int id)
+        public async Task ReactivatePersonByIdAsync(int id)
         {
             _logger.LogInformation($"Reativando pessoa com Id:{id}");
-            Pessoa pessoa = await _pessoaRepository.GetById(id);
+            Pessoa pessoa = await _pessoaRepository.GetByIdAsync(id);
 
             if (pessoa == null)
                 throw new NotFoundException("Não existe pessoa com Id: " + id);
 
             pessoa.IsActive = true;
             _logger.LogInformation($"Pessoa com Id:{id} reativado");
-            await _pessoaRepository.Update(pessoa);
+            await _pessoaRepository.UpdateAsync(pessoa);
         }
 
-        public async Task<LoggedDTO> Login(LoginDTO loginDTO)
+        public async Task<LoggedDTO> LoginAsync(LoginDTO loginDTO)
         {
             _logger.LogInformation($"Efetuando login para {loginDTO.Email}.");
-            loginDTO.Senha = GenerateGuidFromSenha(loginDTO.Senha);
-            Pessoa pessoa = await _pessoaRepository.GetPessoaByEmailESenha(loginDTO.Email, loginDTO.Senha);
+            loginDTO.Password = HashPassword(loginDTO.Password);
+            Pessoa pessoa = await _pessoaRepository.GetByEmailAndPasswordAsync(loginDTO.Email, loginDTO.Password);
             if (pessoa == null)
                 throw new NotFoundException("Email ou senha inválidos");
             if (!pessoa.IsActive)
@@ -78,7 +78,7 @@ namespace Application.Services
             if (!IsEmailValid(pessoa.Email))
                 errorMessage += "Email inválido. ";
 
-            if (!IsSenhaValid(pessoa.Senha))
+            if (!IsPasswordValid(pessoa.Password))
                 errorMessage += "Senha deve conter no mínimo de 8 caracteres com números, letras e caracteres especiais. ";
 
             if(!string.IsNullOrEmpty(errorMessage))
@@ -96,7 +96,7 @@ namespace Application.Services
             return Regex.IsMatch(email, pattern, RegexOptions.IgnoreCase);
         }
 
-        private bool IsSenhaValid(string senha)
+        private bool IsPasswordValid(string senha)
         {
             if (string.IsNullOrWhiteSpace(senha))
                 return false;
@@ -106,9 +106,7 @@ namespace Application.Services
             return Regex.IsMatch(senha, pattern);
         }
 
-
-
-        private string GenerateGuidFromSenha(string senha)
+        private string HashPassword(string senha)
         {
             using var sha256 = SHA256.Create();
             var hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(senha));

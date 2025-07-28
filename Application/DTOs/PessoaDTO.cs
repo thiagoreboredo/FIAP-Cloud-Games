@@ -4,10 +4,10 @@ namespace Application.DTOs
 {
     public class PessoaDTO
     {
-        public string Nome { get; set; }
-        public DateTime DataDeNascimento { get; set; }
+        public string Name { get; set; }
+        public DateTime DateOfBirth { get; set; }
         public string Email { get; set; }
-        public string Senha { get; set; }
+        public string Password { get; set; }
         public ERole Role { get; set; }
 
     }

@@ -7,9 +7,9 @@ namespace FIAP_Cloud_Games.Middleware
     public class GlobalErrorHandlingMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly BaseLogger<GlobalErrorHandlingMiddleware> _logger;
+        private readonly IAppLogger<GlobalErrorHandlingMiddleware> _logger;
 
-        public GlobalErrorHandlingMiddleware(RequestDelegate next, BaseLogger<GlobalErrorHandlingMiddleware> logger)
+        public GlobalErrorHandlingMiddleware(RequestDelegate next, IAppLogger<GlobalErrorHandlingMiddleware> logger)
         {
             _next = next;
             _logger = logger;

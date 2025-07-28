@@ -18,47 +18,47 @@ namespace Application.Services
             _logger = logger;
         }
 
-        public async Task DeleteJogoById(int id)
+        public async Task DeleteGameByIdAsync(int id)
         {
             _logger.LogInformation($"Deletando jogo com id: {id}.");
-            Jogo jogo = await _jogoRepository.GetById(id);
+            Jogo jogo = await _jogoRepository.GetByIdAsync(id);
 
             if (jogo == null)
                 throw new NotFoundException("Não existe jogo com Id: " + id);
 
-            await _jogoRepository.Delete(jogo);
+            await _jogoRepository.DeleteAsync(jogo);
             _logger.LogInformation($"Jogo com id {id} deletado.");
         }
 
-        public async Task UpdateJogoById(int id, JogoDTO jogoDTO)
+        public async Task UpdateGameByIdAsync(int id, JogoDTO jogoDTO)
         {
             _logger.LogInformation($"Atualizando jogo com id: {id}.");
 
             ValidateJogo(jogoDTO);
 
-            Jogo jogo = await _jogoRepository.GetById(id);
+            Jogo jogo = await _jogoRepository.GetByIdAsync(id);
 
             if (jogo == null)
                 throw new NotFoundException("Não existe jogo com Id: " + id);
 
-            jogo.Nome = jogoDTO.Nome;
-            jogo.Empresa = jogoDTO.Empresa;
-            jogo.Preco = jogoDTO.Preco;
-            jogo.Classificacao = jogoDTO.Classificacao;
-            jogo.Genero = jogoDTO.Genero;
+            jogo.Nome = jogoDTO.Name;
+            jogo.Empresa = jogoDTO.Company;
+            jogo.Preco = jogoDTO.Price;
+            jogo.Classificacao = jogoDTO.Rating;
+            jogo.Genero = jogoDTO.Genre;
 
-            await _jogoRepository.Update(jogo);
+            await _jogoRepository.UpdateAsync(jogo);
 
             _logger.LogInformation($"Jogo com id {id} atualizado.");
         }
 
-        public async Task AddJogo(JogoDTO jogoDTO)
+        public async Task AddGameAsync(JogoDTO jogoDTO)
         {
             _logger.LogInformation("Criando jogo.");
 
             ValidateJogo(jogoDTO);
             Jogo jogo = _mapper.Map<Jogo>(jogoDTO);
-            await _jogoRepository.Add(jogo);
+            await _jogoRepository.AddAsync(jogo);
 
             _logger.LogInformation("Jogo criado.");
         }
@@ -72,10 +72,10 @@ namespace Application.Services
                 throw new BadDataException(errorMessage.Trim());
         }
 
-        public async Task<List<JogoDTO>> GetAllJogos()
+        public async Task<List<JogoDTO>> GetAllGamesAsync()
         {
             _logger.LogInformation("Buscando todos os jogos.");
-            List<Jogo> jogos = (await _jogoRepository.GetAll()).ToList();
+            List<Jogo> jogos = (await _jogoRepository.GetAllAsync()).ToList();
             _logger.LogInformation($"{jogos.Count} jogos retonaram.");
             return _mapper.Map<List<JogoDTO>>(jogos);
         }

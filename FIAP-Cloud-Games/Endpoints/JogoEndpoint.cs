@@ -6,38 +6,38 @@ namespace FIAP_Cloud_Games.Endpoints
 {
     public static class JogoEndpoint
     {
-        public static void MapJogoEndpoint(this WebApplication app)
+        public static void MapGameEndpoints(this WebApplication app)
         {
             var jogoMapGroup = app.MapGroup("/jogo").RequireAuthorization();
 
 
-            jogoMapGroup.MapGet("/", GetAllJogos);
-            jogoMapGroup.MapPost("/", CreateJogo).RequireAuthorization("Administrador");
-            jogoMapGroup.MapDelete("/id", DeleteJogo).RequireAuthorization("Administrador");
-            jogoMapGroup.MapPut("/id", UpdateJogo).RequireAuthorization("Administrador");
+            jogoMapGroup.MapGet("/", CreateGame);
+            jogoMapGroup.MapPost("/", GetAllGames).RequireAuthorization("Administrador");
+            jogoMapGroup.MapDelete("/id", DeleteGame).RequireAuthorization("Administrador");
+            jogoMapGroup.MapPut("/id", UpdateGame).RequireAuthorization("Administrador");
         }
 
-        public static async Task<IResult> CreateJogo(JogoDTO jogoDTO, JogoService jogoService)
+        public static async Task<IResult> CreateGame(JogoDTO jogoDTO, JogoService jogoService)
         {
-            await jogoService.AddJogo(jogoDTO);
+            await jogoService.AddGameAsync(jogoDTO);
             return TypedResults.Created();
         }
 
-        public static async Task<IResult> GetAllJogos(JogoService jogoService)
+        public static async Task<IResult> GetAllGames(JogoService jogoService)
         {
-            List<JogoDTO> jogos = await jogoService.GetAllJogos();
+            List<JogoDTO> jogos = await jogoService.GetAllGamesAsync();
             return TypedResults.Ok(jogos);
         }
 
-        public static async Task<IResult> DeleteJogo(int id, JogoService jogoService)
+        public static async Task<IResult> DeleteGame(int id, JogoService jogoService)
         {
-            await jogoService.DeleteJogoById(id);
+            await jogoService.DeleteGameByIdAsync(id);
             return TypedResults.NoContent();
         }
 
-        public static async Task<IResult> UpdateJogo(int id, JogoDTO jogoDTO, JogoService jogoService)
+        public static async Task<IResult> UpdateGame(int id, JogoDTO jogoDTO, JogoService jogoService)
         {
-            await jogoService.UpdateJogoById(id, jogoDTO);
+            await jogoService.UpdateGameByIdAsync(id, jogoDTO);
             return TypedResults.NoContent();
         }
 

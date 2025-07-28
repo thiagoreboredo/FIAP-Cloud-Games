@@ -4,6 +4,6 @@ namespace Domain.Repository
 {
     public interface IPessoaRepository : IRepository<Pessoa>
     {
-        Task<Pessoa> GetPessoaByEmailESenha(string email, string senha);
+        Task<Pessoa> GetByEmailAndPasswordAsync(string email, string senha);
     }
 }

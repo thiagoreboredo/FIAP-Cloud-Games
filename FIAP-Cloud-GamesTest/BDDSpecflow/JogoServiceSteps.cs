@@ -6,8 +6,6 @@ using AutoMapper;
 using Domain.Entity;
 using Domain.Entity.Enum;
 using Domain.Repository;
-using Infrastructure.Middleware;
-using Microsoft.Extensions.Logging;
 using Moq;
 using TechTalk.SpecFlow;
 
@@ -17,8 +15,7 @@ public class JogoServiceSteps
     private readonly ScenarioContext _context;
     private readonly Mock<IJogoRepository> _jogoRepositoryMock = new();
     private readonly Mock<IMapper> _mapperMock = new();
-    private readonly Mock<ILogger<JogoService>> _loggerMock = new();
-    private readonly Mock<ICorrelationIdGenerator> _correlationIdMock = new();
+    private readonly Mock<IAppLogger<JogoService>> _appLoggerMock = new();
     private JogoService _service;
     private JogoDTO _jogoDto;
     private Exception _exception;
@@ -26,7 +23,10 @@ public class JogoServiceSteps
     public JogoServiceSteps(ScenarioContext context)
     {
         _context = context;
-        _service = new JogoService(_jogoRepositoryMock.Object, _mapperMock.Object, new BaseLogger<JogoService>(_loggerMock.Object, _correlationIdMock.Object));
+        _service = new JogoService(
+            _jogoRepositoryMock.Object,
+            _mapperMock.Object,
+            _appLoggerMock.Object);
     }
 
     [Given(@"um jogo com nome ""(.*)"", empresa ""(.*)"", preco (.*), classificacao (.*) e genero (.*)")]
@@ -34,11 +34,11 @@ public class JogoServiceSteps
     {
         _jogoDto = new JogoDTO
         {
-            Nome = nome,
-            Empresa = empresa,
-            Preco = preco,
-            Classificacao = (EClassificacao) classificacao,
-            Genero = (EGenero) genero
+            Name = nome,
+            Company = empresa,
+            Price = preco,
+            Rating = (EClassificacao) classificacao,
+            Genre = (EGenero) genero
         };
     }
 
@@ -55,7 +55,7 @@ public class JogoServiceSteps
             Genero = EGenero.Action
         };
 
-        _jogoRepositoryMock.Setup(r => r.GetById(id)).ReturnsAsync(jogo);
+        _jogoRepositoryMock.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(jogo);
     }
 
     [Given(@"um jogo DTO com nome ""(.*)"", empresa ""(.*)"", preco (.*), classificacao (.*) e genero (.*)")]
@@ -63,11 +63,11 @@ public class JogoServiceSteps
     {
         _jogoDto = new JogoDTO
         {
-            Nome = nome,
-            Empresa = empresa,
-            Preco = preco,
-            Classificacao = (EClassificacao) classificacao,
-            Genero = (EGenero) genero
+            Name = nome,
+            Company = empresa,
+            Price = preco,
+            Rating = (EClassificacao) classificacao,
+            Genre = (EGenero) genero
         };
     }
 
@@ -75,13 +75,13 @@ public class JogoServiceSteps
     public async Task WhenEuAdicionarOJogo()
     {
         _mapperMock.Setup(m => m.Map<Jogo>(_jogoDto)).Returns(new Jogo());
-        await _service.AddJogo(_jogoDto);
+        await _service.AddGameAsync(_jogoDto);
     }
 
     [When(@"eu atualizar o jogo com id (\d+)")]
     public async Task WhenEuAtualizarOJogoComId(int id)
     {
-        await _service.UpdateJogoById(id, _jogoDto);
+        await _service.UpdateGameByIdAsync(id, _jogoDto);
     }
 
     [When(@"eu tentar deletar o jogo com id (\d+)")]
@@ -89,7 +89,7 @@ public class JogoServiceSteps
     {
         try
         {
-            await _service.DeleteJogoById(id);
+            await _service.DeleteGameByIdAsync(id);
         }
         catch (Exception ex)
         {
@@ -100,13 +100,13 @@ public class JogoServiceSteps
     [Then(@"o repositorio deve ter recebido uma chamada para adicionar o jogo")]
     public void ThenRepositorioDeveReceberChamadaAdd()
     {
-        _jogoRepositoryMock.Verify(r => r.Add(It.IsAny<Jogo>()), Times.Once);
+        _jogoRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Jogo>()), Times.Once);
     }
 
     [Then(@"o repositorio deve ter recebido uma chamada para atualizar o jogo")]
     public void ThenRepositorioDeveReceberChamadaUpdate()
     {
-        _jogoRepositoryMock.Verify(r => r.Update(It.IsAny<Jogo>()), Times.Once);
+        _jogoRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Jogo>()), Times.Once);
     }
 
     [Then(@"uma excecao NotFoundException deve ser lancada")]

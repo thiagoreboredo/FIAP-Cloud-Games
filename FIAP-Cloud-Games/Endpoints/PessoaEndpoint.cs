@@ -5,30 +5,30 @@ namespace FIAP_Cloud_Games.Endpoints
 {
     public static class PessoaEndpoint
     {
-        public static void MapPessoaEndpoint(this WebApplication app)
+        public static void MapPersonEndpoints(this WebApplication app)
         {
             var pessoaMapGroup = app.MapGroup("/pessoa");
 
-            pessoaMapGroup.MapPost("/", CreatePessoa);
+            pessoaMapGroup.MapPost("/", CreatePerson);
             pessoaMapGroup.MapPost("/login", Login);
-            pessoaMapGroup.MapPatch("/reativar/id", ReactivatePessoa).RequireAuthorization("Administrador");
+            pessoaMapGroup.MapPatch("/reativar/id", ReactivatePerson).RequireAuthorization("Administrador");
         }
 
-        public static async Task<IResult> CreatePessoa(PessoaDTO pessoaDTO, PessoaService pessoaService)
+        public static async Task<IResult> CreatePerson(PessoaDTO pessoaDTO, PessoaService pessoaService)
         {
-            await pessoaService.AddPessoa(pessoaDTO);            
+            await pessoaService.AddPersonAsync(pessoaDTO);            
             return TypedResults.Created();
         }
 
         public static async Task<IResult> Login(LoginDTO loginDTO, PessoaService pessoaService)
         {
-            LoggedDTO loggedDTO = await pessoaService.Login(loginDTO);
+            LoggedDTO loggedDTO = await pessoaService.LoginAsync(loginDTO);
             return TypedResults.Ok(loggedDTO);
         }
 
-        public static async Task<IResult> ReactivatePessoa(int id, PessoaService pessoaService)
+        public static async Task<IResult> ReactivatePerson(int id, PessoaService pessoaService)
         {
-            await pessoaService.ReactivatePessoaById(id);
+            await pessoaService.ReactivatePersonByIdAsync(id);
             return TypedResults.NoContent();
         }
 
