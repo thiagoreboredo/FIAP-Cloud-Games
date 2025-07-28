@@ -2,9 +2,8 @@
 trigger:
 - main
 
-# Define o ambiente de execução da pipeline. Usaremos uma máquina virtual Ubuntu.
-pool:
-  vmImage: 'ubuntu-latest'
+# Define o ambiente de execução da pipeline. Vamos utilizar inicialmente um self-hosted.
+pool: 'Default'
 
 # Define variáveis que podem ser reutilizadas na pipeline.
 variables:
