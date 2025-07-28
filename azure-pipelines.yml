@@ -1,8 +1,8 @@
-# Define o gatilho (trigger) da pipeline. Ela será executada a cada commit na branch 'main'.
+# Define o gatilho (trigger) da pipeline. Ela será executada a cada commit na branch 'master'.
 trigger:
 - master
 
-# Define o ambiente de execução da pipeline. Vamos utilizar inicialmente um self-hosted.
+# Define o ambiente de execução da pipeline. Usaremos o pool 'Default' do nosso agente self-hosted.
 pool: 'Default'
 
 # Define variáveis que podem ser reutilizadas na pipeline.
@@ -15,7 +15,7 @@ steps:
   displayName: 'Build da Imagem Docker'
   inputs:
     command: 'build'
-    repository: '$(imageName)' # Usa a variável que definimos acima
-    dockerfile: '$(Build.SourcesDirectory)/Dockerfile' # Caminho para o nosso Dockerfile
+    repository: '$(imageName)'
+    dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
     tags: |
-      $(Build.BuildId) # 'Build.BuildId' é uma tag única para cada execução
+      $(Build.BuildId)
