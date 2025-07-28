@@ -1,34 +1,22 @@
-# ASP.NET
-# Build and test ASP.NET projects.
-# Add steps that publish symbols, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4
-
+# Define o gatilho (trigger) da pipeline. Ela será executada a cada commit na branch 'main'.
 trigger:
-- master
+- main
 
+# Define o ambiente de execução da pipeline. Usaremos uma máquina virtual Ubuntu.
 pool:
-  vmImage: 'windows-latest'
+  vmImage: 'ubuntu-latest'
 
+# Define variáveis que podem ser reutilizadas na pipeline.
 variables:
-  solution: '**/*.sln'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
+  imageName: 'fiap-cloud-games' # Nome da imagem Docker que será gerada
 
+# Define os passos (etapas) da pipeline.
 steps:
-- task: NuGetToolInstaller@1
-
-- task: NuGetCommand@2
+- task: Docker@2
+  displayName: 'Build da Imagem Docker'
   inputs:
-    restoreSolution: '$(solution)'
-
-- task: VSBuild@1
-  inputs:
-    solution: '$(solution)'
-    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactStagingDirectory)"'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-
-- task: VSTest@2
-  inputs:
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
+    command: 'build'
+    repository: '$(imageName)' # Usa a variável que definimos acima
+    dockerfile: '$(Build.SourcesDirectory)/Dockerfile' # Caminho para o nosso Dockerfile
+    tags: |
+      $(Build.BuildId) # 'Build.BuildId' é uma tag única para cada execução
