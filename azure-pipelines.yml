@@ -7,10 +7,10 @@ pool: 'Default'
 
 # Define variáveis que podem ser reutilizadas na pipeline.
 variables:
-  imageName: 'fiap-cloud-games' # Nome da imagem Docker que será gerada
+  imageRepository: 'fiap-cloud-games'
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
+  tag: '$(Build.BuildId)'
   acrServiceConnection: 'ConexaoAzureContainerRegistry'
-  acrLoginServer: 'acimel.azurecr.io'
 
 stages:
 - stage: Build
@@ -27,31 +27,20 @@ stages:
         dockerfile: '$(dockerfilePath)'
         tags: '$(Build.BuildId)'
 
-- stage: Push
-  displayName: 'Push da Imagem para o ACR'
-  dependsOn: Build # Só executa se o Build for bem-sucedido
+stages:
+- stage: BuildAndPush
+  displayName: 'Build e Push da Imagem para o Azure Container Registry'
   jobs:
-  - job: Push
-    displayName: Push
+  - job: BuildAndPushJob
+    displayName: 'Build and Push'
+    pool: 'Default'
     steps:
     - task: Docker@2
-      displayName: 'Login no ACR'
+      displayName: 'Build e Push da imagem para o Azure Container Registry'
       inputs:
-        command: 'login'
-        containerRegistry: '$(acrServiceConnection)'
-
-    - task: Docker@2
-      displayName: 'Tag da Imagem'
-      inputs:
-        command: 'tag'
+        command: 'buildAndPush'
         repository: '$(imageRepository)'
-        tags: '$(Build.BuildId)'
-        arguments: '$(acrLoginServer)/$(imageRepository):$(Build.BuildId)'
-
-    - task: Docker@2
-      displayName: 'Push da Imagem'
-      inputs:
-        command: 'push'
-        repository: '$(imageRepository)'
+        dockerfile: '$(dockerfilePath)'
         containerRegistry: '$(acrServiceConnection)'
-        tags: '$(Build.BuildId)'
+        tags: |
+          $(tag)
