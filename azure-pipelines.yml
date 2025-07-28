@@ -13,21 +13,6 @@ variables:
   acrServiceConnection: 'ConexaoAzureContainerRegistry'
 
 stages:
-- stage: Build
-  displayName: 'Build da Imagem Docker'
-  jobs:
-  - job: Build
-    displayName: Build
-    steps:
-    - task: Docker@2
-      displayName: 'Build da Imagem'
-      inputs:
-        command: 'build'
-        repository: '$(imageRepository)'
-        dockerfile: '$(dockerfilePath)'
-        tags: '$(Build.BuildId)'
-
-stages:
 - stage: BuildAndPush
   displayName: 'Build e Push da Imagem para o Azure Container Registry'
   jobs:
