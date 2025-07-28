@@ -1,16 +1,13 @@
 trigger:
 - master
 
-# Define o ambiente de execução da pipeline. Usaremos o pool 'Default' do nosso agente self-hosted.
 pool: 'Default'
 
-# Define variáveis que podem ser reutilizadas na pipeline.
 variables:
   imageRepository: 'fiap-cloud-games'
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
   tag: '$(Build.BuildId)'
-  acrServiceConnection: 'ConexaoAzureContainerRegistry'  
-  acrLoginServer: 'acimel.azurecr.io'
+  acrServiceConnection: 'ConexaoAzureContainerRegistry'
 
 stages:
 - stage: Build
@@ -24,6 +21,7 @@ stages:
       displayName: 'Build da Imagem'
       inputs:
         command: 'build'
+        containerRegistry: '$(acrServiceConnection)'
         repository: '$(imageRepository)'
         dockerfile: '$(dockerfilePath)'
         tags: '$(tag)'
@@ -37,16 +35,10 @@ stages:
     pool: 'Default'
     steps:
     - task: Docker@2
-      displayName: 'Login no Azure Container Registry'
-      inputs:
-        command: 'login'
-        containerRegistry: '$(acrServiceConnection)'
-
-    - task: Docker@2
       displayName: 'Push da Imagem para o Azure Container Registry'
       inputs:
         command: 'push'
-        repository: '$(imageRepository)'
         containerRegistry: '$(acrServiceConnection)'
+        repository: '$(imageRepository)'
         tags: |
           $(tag)
