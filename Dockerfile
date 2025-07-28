@@ -1,15 +1,15 @@
 # Estágio 1: Build da Aplicação
-# Usamos a imagem do SDK do .NET 8 para ter todas as ferramentas de compilação.
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copia todos os arquivos .csproj e o arquivo .sln para restaurar as dependências.
-# Fazer isso em um passo separado otimiza o cache do Docker.
 COPY ["FIAP-Cloud-Games/FIAP-Cloud-Games.sln", "./FIAP-Cloud-Games/"]
 COPY ["Application/Application.csproj", "./Application/"]
 COPY ["Domain/Domain.csproj", "./Domain/"]
 COPY ["Infrastructure/Infrastructure.csproj", "./Infrastructure/"]
 COPY ["FIAP-Cloud-Games/FIAP-Cloud-Games.csproj", "./FIAP-Cloud-Games/"]
+# ADICIONAMOS A LINHA ABAIXO
+COPY ["FIAP-Cloud-GamesTest/FIAP-Cloud-GamesTest.csproj", "./FIAP-Cloud-GamesTest/"]
 
 # O comando restore usa o .sln para restaurar os pacotes de todos os projetos.
 RUN dotnet restore "FIAP-Cloud-Games/FIAP-Cloud-Games.sln"
@@ -28,7 +28,6 @@ FROM build AS publish
 RUN dotnet publish "FIAP-Cloud-Games.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 # Estágio 3: Imagem Final
-# Usamos a imagem base do ASP.NET, que é muito menor e mais segura.
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
