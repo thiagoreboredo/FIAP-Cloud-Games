@@ -1,4 +1,3 @@
-# Define o gatilho (trigger) da pipeline. Ela será executada a cada commit na branch 'master'.
 trigger:
 - master
 
@@ -10,22 +9,44 @@ variables:
   imageRepository: 'fiap-cloud-games'
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
   tag: '$(Build.BuildId)'
-  acrServiceConnection: 'ConexaoAzureContainerRegistry'
+  acrServiceConnection: 'ConexaoAzureContainerRegistry'  
+  acrLoginServer: 'acimel.azurecr.io'
 
 stages:
-- stage: BuildAndPush
-  displayName: 'Build e Push da Imagem para o Azure Container Registry'
+- stage: Build
+  displayName: 'Build da Imagem Docker'
   jobs:
-  - job: BuildAndPushJob
-    displayName: 'Build and Push'
+  - job: BuildJob
+    displayName: 'Build'
     pool: 'Default'
     steps:
     - task: Docker@2
-      displayName: 'Build e Push da imagem para o Azure Container Registry'
+      displayName: 'Build da Imagem'
       inputs:
-        command: 'buildAndPush'
+        command: 'build'
         repository: '$(imageRepository)'
         dockerfile: '$(dockerfilePath)'
+        tags: '$(tag)'
+
+- stage: Push
+  displayName: 'Push da Imagem para o Azure Container Registry'
+  dependsOn: Build
+  jobs:
+  - job: PushJob
+    displayName: 'Push'
+    pool: 'Default'
+    steps:
+    - task: Docker@2
+      displayName: 'Login no Azure Container Registry'
+      inputs:
+        command: 'login'
+        containerRegistry: '$(acrServiceConnection)'
+
+    - task: Docker@2
+      displayName: 'Push da Imagem para o Azure Container Registry'
+      inputs:
+        command: 'push'
+        repository: '$(imageRepository)'
         containerRegistry: '$(acrServiceConnection)'
         tags: |
           $(tag)
