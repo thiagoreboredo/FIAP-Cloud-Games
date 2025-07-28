@@ -10,8 +10,8 @@ namespace Application.Services
     {
         IJogoRepository _jogoRepository;
         IMapper _mapper;
-        BaseLogger<JogoService> _logger;
-        public JogoService(IJogoRepository jogoRepository, IMapper mapper, BaseLogger<JogoService> logger)
+        IAppLogger<JogoService> _logger;
+        public JogoService(IJogoRepository jogoRepository, IMapper mapper, IAppLogger<JogoService> logger)
         {
             _jogoRepository = jogoRepository;
             _mapper = mapper;

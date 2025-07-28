@@ -18,10 +18,10 @@ namespace Application.Services
     {
         IPessoaRepository _pessoaRepository;
         IMapper _mapper;
-        BaseLogger<PessoaService> _logger;
+        IAppLogger<PessoaService> _logger;
         private readonly IConfiguration _configuration;
 
-        public PessoaService(IPessoaRepository pessoaRepository, IMapper mapper, IConfiguration configuration, BaseLogger<PessoaService> logger)
+        public PessoaService(IPessoaRepository pessoaRepository, IMapper mapper, IConfiguration configuration, IAppLogger<PessoaService> logger)
         {
             _pessoaRepository = pessoaRepository;
             _mapper = mapper;

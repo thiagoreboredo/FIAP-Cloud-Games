@@ -1,14 +1,15 @@
-﻿using Infrastructure.Middleware;
+﻿using Application.Helper;
+using Infrastructure.Middleware;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Helper
+namespace Infrastructure.Logging
 {
-    public class BaseLogger<T>
+    public class AppLogger<T> : IAppLogger<T>
     {
-        protected readonly ILogger<T> _logger;
-        protected readonly ICorrelationIdGenerator _correlationId;
+        private readonly ILogger<T> _logger;
+        private readonly ICorrelationIdGenerator _correlationId;
 
-        public BaseLogger(ILogger<T> logger, ICorrelationIdGenerator correlationId)
+        public AppLogger(ILogger<T> logger, ICorrelationIdGenerator correlationId)
         {
             _logger = logger;
             _correlationId = correlationId;
