@@ -1,8 +1,9 @@
 ﻿using Domain.Entity.Enum;
+using Domain.Repository;
 
 namespace Domain.Entity
 {
-    public class Jogo : EntityBase
+    public class Jogo : EntityBase, IAggregateRoot
     {
         public string Nome { get; set; }
         public string Empresa { get; set; }

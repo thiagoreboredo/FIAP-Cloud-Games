@@ -1,8 +1,9 @@
 ﻿using Domain.Entity.Enum;
+using Domain.Repository;
 
 namespace Domain.Entity
 {
-    public class Pessoa : EntityBase
+    public class Pessoa : EntityBase, IAggregateRoot
     {
         public string Nome { get; set; }
         public DateTime DataDeNascimento { get; set; }
