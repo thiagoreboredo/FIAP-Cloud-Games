@@ -21,7 +21,7 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-#region injeção de dependência
+#region injeÃ§Ã£o de dependÃªncia
 builder.Services.AddScoped<IPessoaRepository, PessoaRepository>();
 builder.Services.AddScoped<PessoaService>();
 builder.Services.AddScoped<IJogoRepository, JogoRepository>();
@@ -91,8 +91,6 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Administrador", policy => policy.RequireRole("Administrador"));
 });
-
-builder.Services.AddControllers();
 
 #endregion
 
