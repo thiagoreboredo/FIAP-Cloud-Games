@@ -96,13 +96,10 @@ builder.Services.AddAuthorization(options =>
 #endregion
 
 # region EF 
-var configuration = new ConfigurationBuilder()
-    .AddJsonFile("appsettings.json")
-    .Build();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    options.UseNpgsql(configuration.GetConnectionString("ConnectionString"));
-}, ServiceLifetime.Scoped);
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
 #endregion
 
 var app = builder.Build();
