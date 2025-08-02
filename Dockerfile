@@ -27,24 +27,34 @@ FROM build AS publish
 RUN dotnet publish "FIAP-Cloud-Games.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 # Estágio 3: Obter o tracer do Datadog
-FROM ghcr.io/datadog/dd-trace-dotnet/dd-trace-dotnet:latest_snapshot
+FROM ghcr.io/datadog/dd-trace-dotnet/dd-trace-dotnet:latest AS datadog-tracer
 
 # Estágio 4: Imagem Final
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+WORKDIR /app
 
-# Copia os arquivos do tracer do Datadog do estágio anterior
-COPY --from=datadog-tracer /opt/datadog-dotnet /opt/datadog
+# Copia os arquivos do tracer do Datadog
+COPY --from=datadog-tracer /opt/datadog /opt/datadog
 
-# Muda para o usuário root apenas para dar permissão de execução
+# Define permissões para o script
 USER root
-RUN chmod +x /opt/datadog/create-dotnet-tracer-env.sh
+RUN chmod +x /opt/datadog/createLogPath.sh
 
-# Volta para o usuário padrão da imagem (boa prática de segurança)
+# Volta para o usuário padrão
 USER app
 
-
-WORKDIR /app
+# Copia os arquivos publicados
 COPY --from=publish /app/publish .
 
-# Define o ponto de entrada que irá iniciar a sua API quando o contêiner rodar.
-ENTRYPOINT ["/opt/datadog/create-dotnet-tracer-env.sh", "dotnet", "FIAP-Cloud-Games.dll"]
+# Define variáveis de ambiente para o Datadog
+ENV CORECLR_ENABLE_PROFILING=1 \
+    CORECLR_PROFILER={846F5F1C-F9AE-4B07-969E-05C26BC060D8} \
+    CORECLR_PROFILER_PATH=/opt/datadog/Datadog.Trace.ClrProfiler.Native.so \
+    DD_DOTNET_TRACER_HOME=/opt/datadog \
+    DD_SERVICE=fiap-cloud-games \
+    DD_ENV=production \
+    DD_LOGS_INJECTION=true \
+    DD_RUNTIME_METRICS_ENABLED=true
+
+# Define o ponto de entrada
+ENTRYPOINT ["/opt/datadog/createLogPath.sh", "dotnet", "FIAP-Cloud-Games.dll"]
