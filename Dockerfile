@@ -27,7 +27,7 @@ FROM build AS publish
 RUN dotnet publish "FIAP-Cloud-Games.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 # Estágio 3: Obter o tracer do Datadog
-FROM ghcr.io/datadog/dd-trace-dotnet:3.22.0 AS datadog-tracer
+FROM ghcr.io/datadog/dd-trace-dotnet/dd-trace-dotnet:latest_snapshot
 
 # Estágio 4: Imagem Final
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
