@@ -33,7 +33,7 @@ FROM ghcr.io/datadog/dd-trace-dotnet/dd-trace-dotnet:latest AS datadog-tracer
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 
 # Copia os arquivos do tracer do Datadog do estágio anterior
-COPY --from=datadog-tracer /opt/datadog /opt/datadog
+COPY --from=datadog-tracer /opt/datadog-dotnet /opt/datadog
 
 # Muda para o usuário root apenas para dar permissão de execução
 USER root
