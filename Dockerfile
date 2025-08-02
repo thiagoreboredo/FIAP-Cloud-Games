@@ -26,25 +26,16 @@ RUN dotnet build "FIAP-Cloud-Games.csproj" -c Release -o /app/build
 FROM build AS publish
 RUN dotnet publish "FIAP-Cloud-Games.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
-# Estágio 3: Obter o tracer do Datadog
-FROM ghcr.io/datadog/dd-trace-dotnet/dd-trace-dotnet:latest AS datadog-tracer
-
-# Estágio 4: Imagem Final
+# Estágio 3: Imagem Final
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 
-# Copia os arquivos do tracer do Datadog
-COPY --from=datadog-tracer /opt/datadog /opt/datadog
-
-# Define permissões para o script
-USER root
-RUN chmod +x /opt/datadog/createLogPath.sh
-
-# Volta para o usuário padrão
-USER app
-
-# Copia os arquivos publicados
-COPY --from=publish /app/publish .
+# Instala dependências necessárias e o tracer da Datadog
+RUN apt-get update && apt-get install -y curl \
+    && curl -LO https://github.com/DataDog/dd-trace-dotnet/releases/download/v2.50.0/datadog-dotnet-apm_2.50.0_amd64.deb \
+    && dpkg -i datadog-dotnet-apm_2.50.0_amd64.deb \
+    && rm datadog-dotnet-apm_2.50.0_amd64.deb \
+    && apt-get clean
 
 # Define variáveis de ambiente para o Datadog
 ENV CORECLR_ENABLE_PROFILING=1 \
@@ -54,7 +45,13 @@ ENV CORECLR_ENABLE_PROFILING=1 \
     DD_SERVICE=fiap-cloud-games \
     DD_ENV=production \
     DD_LOGS_INJECTION=true \
-    DD_RUNTIME_METRICS_ENABLED=true
+    DD_RUNTIME_METRICS_ENABLED=true \
+    DD_TRACE_DEBUG=true \
+    DD_AGENT_HOST=datadog-agent \
+    DD_API_KEY=your-api-key-here
+
+# Copia os arquivos publicados
+COPY --from=publish /app/publish .
 
 # Define o ponto de entrada
-ENTRYPOINT ["/opt/datadog/createLogPath.sh", "dotnet", "FIAP-Cloud-Games.dll"]
+ENTRYPOINT ["dotnet", "FIAP-Cloud-Games.dll"]
