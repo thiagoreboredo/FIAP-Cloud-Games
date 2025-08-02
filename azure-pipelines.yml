@@ -4,10 +4,17 @@ trigger:
 pool: 'Default'
 
 variables:
+  # Variáveis Gerais
   imageRepository: 'fiap-cloud-games'
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
   tag: '$(Build.BuildId)'
+  
+  # Variáveis do Azure
   acrServiceConnection: 'ConexaoAzureContainerRegistry'
+  azureSubscription: 'Acimel - PROD'
+  resourceGroup: 'FIAP'
+  containerAppName: 'api-fiap-cloud-games'
+  acrLoginServer: 'acimel.azurecr.io'
 
 stages:
 - stage: Build
@@ -42,3 +49,19 @@ stages:
         repository: '$(imageRepository)'
         tags: |
           $(tag)
+
+- stage: Deploy
+  displayName: 'Deploy no Azure Container App'
+  dependsOn: Push
+  jobs:
+  - job: DeployJob
+    displayName: 'Deploy'
+    pool: 'Default'
+    steps:
+    - task: AzureContainerApps@1
+      displayName: 'Deploy da Imagem no Azure Container App'
+      inputs:
+        azureSubscription: '$(azureSubscription)'
+        resourceGroupName: '$(resourceGroup)'
+        containerAppName: '$(containerAppName)'
+        imageToDeploy: '$(acrLoginServer)/$(imageRepository):$(tag)'
