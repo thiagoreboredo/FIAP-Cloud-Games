@@ -48,11 +48,11 @@ public class JogoServiceSteps
         var jogo = new Jogo
         {
             Id = id,
-            Nome = "Existente",
-            Empresa = "DevCompany",
-            Preco = 100,
-            Classificacao = EClassificacao.Livre,
-            Genero = EGenero.Action
+            Name = "Existente",
+            Company = "DevCompany",
+            Price = 100,
+            Rating = EClassificacao.Livre,
+            Genre = EGenero.Action
         };
 
         _jogoRepositoryMock.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(jogo);

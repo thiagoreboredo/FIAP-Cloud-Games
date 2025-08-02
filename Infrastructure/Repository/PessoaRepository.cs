@@ -10,10 +10,10 @@ namespace Infrastructure.Repository
         {
         }
 
-        public async Task<Pessoa> GetByEmailAndPasswordAsync(string email, string senha)
+        public async Task<Pessoa> GetByEmailAndPasswordAsync(string email, string password)
         {
 
-            return await _dbSet.FirstOrDefaultAsync(entity => entity.Email == email && entity.Senha == senha);
+            return await _dbSet.FirstOrDefaultAsync(entity => entity.Email == email && entity.Password == password);
         }
     }
 }

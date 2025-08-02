@@ -2,11 +2,11 @@
 {
     public class Promocao : EntityBase
     {
-        public string Nome { get; set; }
-        public DateTime DataInicio { get; set; }
-        public DateTime DataFim { get; set; }
-        public int ValorDoDescontoPorcetagem { get; set; }
+        public string Name { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public int DiscountPercentage { get; set; }
 
-        public ICollection<Jogo> Jogos { get; set; }
+        public ICollection<Jogo> Games { get; set; }
     }
 }

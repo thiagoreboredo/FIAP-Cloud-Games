@@ -33,7 +33,7 @@ namespace Application.Services
         {
             _logger.LogInformation($"Adicionando nova pessoa.");
 
-            ValidatePessoa(pessoaDTO);
+            ValidatePerson(pessoaDTO);
             pessoaDTO.Password = HashPassword(pessoaDTO.Password);
             var pessoaToAdd = _mapper.Map<Pessoa>(pessoaDTO);
             await _pessoaRepository.AddAsync(pessoaToAdd);
@@ -70,7 +70,7 @@ namespace Application.Services
             return loggedDTO;
         }
 
-        private void ValidatePessoa(PessoaDTO pessoa)
+        private void ValidatePerson(PessoaDTO pessoa)
         {
             string errorMessage = "";
             errorMessage = ValidationHelper.ValidaEmpties<PessoaDTO>(pessoa, errorMessage);
@@ -96,20 +96,20 @@ namespace Application.Services
             return Regex.IsMatch(email, pattern, RegexOptions.IgnoreCase);
         }
 
-        private bool IsPasswordValid(string senha)
+        private bool IsPasswordValid(string password)
         {
-            if (string.IsNullOrWhiteSpace(senha))
+            if (string.IsNullOrWhiteSpace(password))
                 return false;
 
             // Pelo menos 8 caracteres, 1 letra, 1 número e 1 caractere especial
             var pattern = @"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&^+=_\-])[A-Za-z\d@$!%*#?&^+=_\-]{8,}$";
-            return Regex.IsMatch(senha, pattern);
+            return Regex.IsMatch(password, pattern);
         }
 
-        private string HashPassword(string senha)
+        private string HashPassword(string password)
         {
             using var sha256 = SHA256.Create();
-            var hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(senha));
+            var hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
 
             var guidBytes = new byte[16];
             Array.Copy(hash, guidBytes, 16);

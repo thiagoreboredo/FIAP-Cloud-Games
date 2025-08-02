@@ -34,18 +34,18 @@ namespace Application.Services
         {
             _logger.LogInformation($"Atualizando jogo com id: {id}.");
 
-            ValidateJogo(jogoDTO);
+            ValidateGame(jogoDTO);
 
             Jogo jogo = await _jogoRepository.GetByIdAsync(id);
 
             if (jogo == null)
                 throw new NotFoundException("Não existe jogo com Id: " + id);
 
-            jogo.Nome = jogoDTO.Name;
-            jogo.Empresa = jogoDTO.Company;
-            jogo.Preco = jogoDTO.Price;
-            jogo.Classificacao = jogoDTO.Rating;
-            jogo.Genero = jogoDTO.Genre;
+            jogo.Name = jogoDTO.Name;
+            jogo.Company = jogoDTO.Company;
+            jogo.Price = jogoDTO.Price;
+            jogo.Rating = jogoDTO.Rating;
+            jogo.Genre = jogoDTO.Genre;
 
             await _jogoRepository.UpdateAsync(jogo);
 
@@ -56,14 +56,14 @@ namespace Application.Services
         {
             _logger.LogInformation("Criando jogo.");
 
-            ValidateJogo(jogoDTO);
+            ValidateGame(jogoDTO);
             Jogo jogo = _mapper.Map<Jogo>(jogoDTO);
             await _jogoRepository.AddAsync(jogo);
 
             _logger.LogInformation("Jogo criado.");
         }
 
-        private void ValidateJogo(JogoDTO jogo)
+        private void ValidateGame(JogoDTO jogo)
         {
             string errorMessage = "";
             errorMessage = ValidationHelper.ValidaEmpties<JogoDTO>(jogo, errorMessage);

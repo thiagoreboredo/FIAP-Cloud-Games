@@ -147,7 +147,7 @@ namespace FIAP_Cloud_GamesTest.Services
 
             _pessoaRepositoryMock
                 .Setup(r => r.GetByEmailAndPasswordAsync(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(new Pessoa() { Email = loginDTO.Email, Senha = loginDTO.Password, IsActive = true });
+                .ReturnsAsync(new Pessoa() { Email = loginDTO.Email, Password = loginDTO.Password, IsActive = true });
 
             // Act
             var result = await service.LoginAsync(loginDTO);
@@ -184,7 +184,7 @@ namespace FIAP_Cloud_GamesTest.Services
 
             _pessoaRepositoryMock
                 .Setup(r => r.GetByEmailAndPasswordAsync(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(new Pessoa() { Email = loginDTO.Email, Senha = loginDTO.Password, IsActive = false });
+                .ReturnsAsync(new Pessoa() { Email = loginDTO.Email, Password = loginDTO.Password, IsActive = false });
 
             // Act
             var exception = await Assert.ThrowsAsync<BadDataException>(() => service.LoginAsync(loginDTO));

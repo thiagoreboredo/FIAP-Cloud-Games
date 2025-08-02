@@ -8,10 +8,8 @@ namespace Application.Mapping
     {
         public MappingProfile()
         {
-            CreateMap<Pessoa, PessoaDTO>();
-            CreateMap<PessoaDTO, Pessoa>();
-            CreateMap<Jogo, JogoDTO>();
-            CreateMap<JogoDTO, Jogo>();
+            CreateMap<Pessoa, PessoaDTO>().ReverseMap();
+            CreateMap<Jogo, JogoDTO>().ReverseMap();
         }
     }
 }

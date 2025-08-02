@@ -5,15 +5,15 @@ namespace Domain.Entity
 {
     public class Jogo : EntityBase, IAggregateRoot
     {
-        public string Nome { get; set; }
-        public string Empresa { get; set; }
-        public double Preco { get; set; }
+        public string Name { get; set; }
+        public string Company { get; set; }
+        public double Price { get; set; }
 
-        public EClassificacao Classificacao { get; set; }
-        public EGenero Genero { get; set; }
+        public EClassificacao Rating { get; set; }
+        public EGenero Genre { get; set; }
 
-        public ICollection<Promocao> Promocoes { get; set; }
+        public ICollection<Promocao> Promotions { get; set; }
 
-        public ICollection<Pessoa> Pessoas { get; set; }
+        public ICollection<Pessoa> People { get; set; }
     }
 }
