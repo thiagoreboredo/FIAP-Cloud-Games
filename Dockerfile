@@ -29,9 +29,15 @@ RUN dotnet publish "FIAP-Cloud-Games.csproj" -c Release -o /app/publish /p:UseAp
 # Estágio 3: Imagem Final
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 
+# Muda para o usuário root para poder instalar pacotes
+USER root
+# Atualiza os pacotes e instala o curl
+RUN apt-get update && apt-get install -y curl
 # Baixa e executa o script de instalação do agente APM do Datadog para .NET
 RUN curl -L --output datadog-dotnet-apm.sh https://dtdg.co/dotnet-apm-install
 RUN sh datadog-dotnet-apm.sh
+# Volta para o usuário padrão da imagem, que não é root (boa prática de segurança)
+USER app
 
 WORKDIR /app
 COPY --from=publish /app/publish .
