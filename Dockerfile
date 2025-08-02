@@ -31,12 +31,13 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 
 # Muda para o usuário root para poder instalar pacotes
 USER root
-# Atualiza os pacotes e instala as ferramentas necessárias (curl e unzip)
-RUN apt-get update && apt-get install -y curl unzip
-# Baixa o zip do agente Datadog, descompacta na pasta correta e remove o zip
-RUN curl -Lo /dd-trace-dotnet.zip https://github.com/DataDog/dd-trace-dotnet/releases/latest/download/datadog-dotnet-apm-2.50.0-linux-musl-x64.tar.gz && \
-    tar -xzf /dd-trace-dotnet.zip -C /opt/datadog && \
-    rm /dd-trace-dotnet.zip
+# Atualiza os pacotes e instala as ferramentas necessárias (curl e tar)
+RUN apt-get update && apt-get install -y curl tar
+# Baixa o tarball do agente Datadog, descompacta na pasta correta e remove o arquivo baixado
+RUN curl -Lo datadog-dotnet-apm.tar.gz https://github.com/DataDog/dd-trace-dotnet/releases/latest/download/dd-trace-linux-musl-x64.tar.gz && \
+    mkdir -p /opt/datadog && \
+    tar -xzf datadog-dotnet-apm.tar.gz -C /opt/datadog && \
+    rm datadog-dotnet-apm.tar.gz
 # Volta para o usuário padrão da imagem (boa prática de segurança)
 USER app
 
