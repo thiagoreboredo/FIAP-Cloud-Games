@@ -11,6 +11,7 @@ variables:
   azureSubscription: 'Acimel - PROD(8ad60e49-3122-49d8-b64e-1e7f12380229)'
   resourceGroup: 'FIAP'
   containerAppName: 'api-fiap-cloud-games'
+  containerAppEnvironment: 'managedEnvironment-FIAP-8860'
   acrLoginServer: 'acimel.azurecr.io'
 
 stages:
@@ -64,7 +65,7 @@ stages:
         inlineScript: |
           az containerapp env telemetry data-dog set `
             --resource-group $(resourceGroup) `
-            --name $(containerAppName)Environment `
+            --name $(containerAppEnvironment) `
             --site "datadoghq.com" `
             --key "$(DatadogApiKey)" `
             --enable-open-telemetry-traces true `
