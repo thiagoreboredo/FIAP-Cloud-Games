@@ -31,13 +31,16 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 
 # Muda para o usuário root para poder instalar pacotes
 USER root
-# Atualiza os pacotes e instala as ferramentas necessárias (curl e tar)
+# Atualiza os pacotes e instala as ferramentas necessárias
 RUN apt-get update && apt-get install -y curl tar
-# Baixa o tarball do agente Datadog, descompacta na pasta correta e remove o arquivo baixado
+
+# Baixa o tarball do agente Datadog, descompacta, torna o script executável e remove o arquivo baixado
 RUN curl -Lo datadog-dotnet-apm.tar.gz https://github.com/DataDog/dd-trace-dotnet/releases/latest/download/dd-trace-linux-x64.tar.gz && \
     mkdir -p /opt/datadog && \
     tar -xzf datadog-dotnet-apm.tar.gz -C /opt/datadog && \
+    chmod +x /opt/datadog/create-dotnet-tracer-env.sh && \
     rm datadog-dotnet-apm.tar.gz
+
 # Volta para o usuário padrão da imagem (boa prática de segurança)
 USER app
 
@@ -45,5 +48,4 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 
 # Define o ponto de entrada que irá iniciar a sua API quando o contêiner rodar.
-# Esta linha executa o script do Datadog antes de iniciar a aplicação
 ENTRYPOINT ["/opt/datadog/create-dotnet-tracer-env.sh", "dotnet", "FIAP-Cloud-Games.dll"]
