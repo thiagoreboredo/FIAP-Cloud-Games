@@ -45,4 +45,5 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 
 # Define o ponto de entrada que irá iniciar a sua API quando o contêiner rodar.
-ENTRYPOINT ["dotnet", "FIAP-Cloud-Games.dll"]
+# Esta linha executa o script do Datadog antes de iniciar a aplicação
+ENTRYPOINT ["/opt/datadog/create-dotnet-tracer-env.sh", "dotnet", "FIAP-Cloud-Games.dll"]
