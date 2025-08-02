@@ -26,23 +26,18 @@ RUN dotnet build "FIAP-Cloud-Games.csproj" -c Release -o /app/build
 FROM build AS publish
 RUN dotnet publish "FIAP-Cloud-Games.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
-# Estágio 3: Imagem Final
+# Estágio 3: Obter o tracer do Datadog
+FROM ghcr.io/datadog/dd-trace-dotnet/dd-trace-dotnet:latest AS datadog-tracer
+
+# Estágio 4: Imagem Final
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 
-# Muda para o usuário root para poder instalar pacotes
+# Copia os arquivos do tracer do Datadog do estágio anterior
+COPY --from=datadog-tracer /opt/datadog /opt/datadog
+
+# Muda para o usuário root apenas para dar permissão de execução
 USER root
-# Atualiza os pacotes e instala as ferramentas necessárias
-RUN apt-get update && apt-get install -y curl tar
-# Baixa o tarball do agente Datadog, descompacta, lista o conteúdo para depuração, torna o script executável e remove o arquivo baixado
-RUN set -ex && \
-    curl -Lf --output datadog-dotnet-apm.tar.gz https://github.com/DataDog/dd-trace-dotnet/releases/latest/download/dd-trace-linux-x64.tar.gz && \
-    mkdir -p /opt/datadog && \
-    tar -xzf datadog-dotnet-apm.tar.gz -C /opt/datadog --strip-components=1 && \
-    echo "--- Conteúdo de /opt/datadog após extração: ---" && \
-    ls -lR /opt/datadog && \
-    echo "--- Fim do conteúdo ---" && \
-    chmod +x /opt/datadog/create-dotnet-tracer-env.sh && \
-    rm datadog-dotnet-apm.tar.gz
+RUN chmod +x /opt/datadog/create-dotnet-tracer-env.sh
 
 # Volta para o usuário padrão da imagem (boa prática de segurança)
 USER app
