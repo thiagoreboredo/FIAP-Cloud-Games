@@ -4,12 +4,9 @@ trigger:
 pool: 'Default'
 
 variables:
-  # Variáveis Gerais
   imageRepository: 'fiap-cloud-games'
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
   tag: '$(Build.BuildId)'
-  
-  # Variáveis do Azure
   acrServiceConnection: 'ConexaoAzureContainerRegistry'
   azureSubscription: 'Acimel - PROD(8ad60e49-3122-49d8-b64e-1e7f12380229)'
   resourceGroup: 'FIAP'
