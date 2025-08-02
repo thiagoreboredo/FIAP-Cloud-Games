@@ -31,14 +31,10 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 
 # Muda para o usuário root para poder instalar pacotes
 USER root
-# Atualiza os pacotes e instala o curl e o dos2unix
-RUN apt-get update && apt-get install -y curl dos2unix
-# Baixa o script de instalação do agente
-RUN curl -L --output datadog-dotnet-apm.sh https://dtdg.co/dotnet-apm-install
-# Converte os finais de linha do script para o formato Unix
-RUN dos2unix datadog-dotnet-apm.sh
-# Executa o script
-RUN sh datadog-dotnet-apm.sh
+# Atualiza os pacotes e instala o curl
+RUN apt-get update && apt-get install -y curl
+# Baixa e executa o script do Datadog diretamente, sem salvar em arquivo
+RUN curl -L https://dtdg.co/dotnet-apm-install | sh
 # Volta para o usuário padrão da imagem (boa prática de segurança)
 USER app
 
