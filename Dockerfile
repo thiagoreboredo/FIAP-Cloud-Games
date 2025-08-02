@@ -29,8 +29,17 @@ RUN dotnet publish "FIAP-Cloud-Games.csproj" -c Release -o /app/publish /p:UseAp
 # Estágio 3: Imagem Final
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 
-# Copia os arquivos do agente Datadog a partir da imagem de inicialização oficial deles
-COPY --from=datadog/dd-lib-dotnet-init:v1 /datadog /opt/datadog
+# Muda para o usuário root para poder instalar pacotes
+USER root
+# Atualiza os pacotes e instala as ferramentas necessárias (curl e tar)
+RUN apt-get update && apt-get install -y curl tar
+# Baixa o tarball do agente Datadog, descompacta na pasta correta e remove o arquivo baixado
+RUN curl -Lo datadog-dotnet-apm.tar.gz https://github.com/DataDog/dd-trace-dotnet/releases/latest/download/dd-trace-linux-musl-x64.tar.gz && \
+    mkdir -p /opt/datadog && \
+    tar -xzf datadog-dotnet-apm.tar.gz -C /opt/datadog && \
+    rm datadog-dotnet-apm.tar.gz
+# Volta para o usuário padrão da imagem (boa prática de segurança)
+USER app
 
 WORKDIR /app
 COPY --from=publish /app/publish .
