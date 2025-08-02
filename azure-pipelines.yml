@@ -55,6 +55,21 @@ stages:
     displayName: 'Deploy'
     pool: 'Default'
     steps:
+    - task: AzureCLI@2
+      displayName: 'Configurar OpenTelemetry para Datadog'
+      inputs:
+        azureSubscription: '$(azureSubscription)'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          az containerapp env telemetry data-dog set \
+            --resource-group $(resourceGroup) \
+            --name $(containerAppName)Environment \
+            --site "datadoghq.com" \
+            --key $(DatadogApiKey) \
+            --enable-open-telemetry-traces true \
+            --enable-open-telemetry-metrics true
+
     - task: AzureContainerApps@1
       displayName: 'Deploy da Imagem no Azure Container App'
       inputs:
