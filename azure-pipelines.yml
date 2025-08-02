@@ -59,15 +59,15 @@ stages:
       displayName: 'Configurar OpenTelemetry para Datadog'
       inputs:
         azureSubscription: '$(azureSubscription)'
-        scriptType: 'bash'
+        scriptType: 'pscore'
         scriptLocation: 'inlineScript'
         inlineScript: |
-          az containerapp env telemetry data-dog set \
-            --resource-group $(resourceGroup) \
-            --name $(containerAppName)Environment \
-            --site "datadoghq.com" \
-            --key $(DatadogApiKey) \
-            --enable-open-telemetry-traces true \
+          az containerapp env telemetry data-dog set `
+            --resource-group $(resourceGroup) `
+            --name $(containerAppName)Environment `
+            --site "datadoghq.com" `
+            --key "$(DatadogApiKey)" `
+            --enable-open-telemetry-traces true `
             --enable-open-telemetry-metrics true
 
     - task: AzureContainerApps@1
