@@ -59,6 +59,6 @@ stages:
       displayName: 'Deploy da Imagem no Azure Container App'
       inputs:
         azureSubscription: '$(azureSubscription)'
-        resourceGroupName: '$(resourceGroup)'
+        resourceGroup: '$(resourceGroup)'
         containerAppName: '$(containerAppName)'
         imageToDeploy: '$(acrLoginServer)/$(imageRepository):$(tag)'
