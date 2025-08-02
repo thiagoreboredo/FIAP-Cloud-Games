@@ -8,7 +8,6 @@ COPY ["Application/Application.csproj", "./Application/"]
 COPY ["Domain/Domain.csproj", "./Domain/"]
 COPY ["Infrastructure/Infrastructure.csproj", "./Infrastructure/"]
 COPY ["FIAP-Cloud-Games/FIAP-Cloud-Games.csproj", "./FIAP-Cloud-Games/"]
-# ADICIONAMOS A LINHA ABAIXO
 COPY ["FIAP-Cloud-GamesTest/FIAP-Cloud-GamesTest.csproj", "./FIAP-Cloud-GamesTest/"]
 
 # O comando restore usa o .sln para restaurar os pacotes de todos os projetos.
@@ -29,6 +28,11 @@ RUN dotnet publish "FIAP-Cloud-Games.csproj" -c Release -o /app/publish /p:UseAp
 
 # Estágio 3: Imagem Final
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+
+# Baixa e executa o script de instalação do agente APM do Datadog para .NET
+RUN curl -L --output datadog-dotnet-apm.sh https://dtdg.co/dotnet-apm-install
+RUN sh datadog-dotnet-apm.sh
+
 WORKDIR /app
 COPY --from=publish /app/publish .
 
