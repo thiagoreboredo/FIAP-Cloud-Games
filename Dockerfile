@@ -29,24 +29,16 @@ RUN dotnet publish "FIAP-Cloud-Games.csproj" -c Release -o /app/publish /p:UseAp
 # Estágio 3: Imagem Final
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 
-# ---- INÍCIO: Instalação do Agente New Relic ----
-# Instala pré-requisitos essenciais
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-    gnupg \
-    ca-certificates
-# Adiciona a chave de segurança GPG do New Relic (usando o método moderno e seguro)
-RUN curl -fsSL https://download.newrelic.com/548C16BF.gpg | gpg --dearmor -o /etc/apt/keyrings/newrelic.gpg
-# Adiciona o repositório APT do New Relic (usando a URL que o assistente confirmou)
-RUN echo "deb [signed-by=/etc/apt/keyrings/newrelic.gpg] http://apt.newrelic.com/debian/ newrelic non-free" \
-    | tee /etc/apt/sources.list.d/newrelic.list
-# Atualiza a lista de pacotes e instala o agente .NET
-RUN apt-get update && apt-get install -y newrelic-dotnet-agent
-# Limpa o cache do apt para reduzir o tamanho da imagem
-RUN rm -rf /var/lib/apt/lists/*
-# ---- FIM: Instalação do Agente New Relic ----
+# Instalar New Relic .NET Agent
+RUN apt-get update && apt-get install -y wget ca-certificates gnupg \
+&& echo 'deb http://apt.newrelic.com/debian/ newrelic non-free' | tee /etc/apt/sources.list.d/newrelic.list \
+&& wget https://download.newrelic.com/548C16BF.gpg \
+&& apt-key add 548C16BF.gpg \
+&& apt-get update \
+&& apt-get install -y 'newrelic-dotnet-agent' \
+&& rm -rf /var/lib/apt/lists/*
 
-# Enable the agent
+# Ativando o New Relic .NET Agent
 ENV CORECLR_ENABLE_PROFILING=1
 CORECLR_PROFILER={36032161-FFC0-4B61-B559-F6C5D41BAE5A}
 CORECLR_NEWRELIC_HOME=/usr/local/newrelic-dotnet-agent
