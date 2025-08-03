@@ -6,32 +6,19 @@ API RESTful para gerenciar usuários e biblioteca de jogos digitais, desenvolvid
 
 ## Índice 📑
 
-1. [🎯 Objetivos](#objetivos)
-2. [🖼️ Visão Geral do Projeto](#visão-geral-do-projeto)
-3. [📈 Diagrama de Estrutura](#diagrama-de-estrutura)
-4. [🛠️ Tecnologias](#tecnologias)
-5. [📡 Monitoramento Contínuo com New Relic](#monitoramento)
-6. [📋 Pré-requisitos](#pré-requisitos)
-7. [📂 Estrutura do Repositório](#estrutura-do-repositório)
-8. [⚙️ Configuração Inicial](#configuração-inicial)
-
-   - [1. Clonar o Repositório](#1-clonar-o-repositório)
-   - [2. Ajustar Strings de Conexão](#2-ajustar-strings-de-conexão)
-
-9. [▶️ Como Executar a API](#como-executar-a-api)
-
-   - [🔍 Acesse o Swagger](#acesse-o-swagger)
-
-10. [🔗 Endpoints Principais](#endpoints-principais)
-
-   - [🔑 Autenticação](#autenticação)
-   - [👤 Usuários](#usuários)
-   - [🎮 Jogos](#jogos)
-   - [📚 Biblioteca de Jogos](#biblioteca-de-jogos)
-
-11. [✅ Testes Unitários](#testes-unitários)
-12. [🤝 Contribuindo](#contribuindo)
-13. [📄 Licença](#licença)
+1.  [🎯 Objetivos](#-objetivos)
+2.  [🖼️ Visão Geral do Projeto](#️-visão-geral-do-projeto)
+3.  [📈 Diagrama de Estrutura](#-diagrama-de-estrutura)
+4.  [🛠️ Tecnologias](#️-tecnologias)
+5.  [📡 Monitoramento Contínuo com New Relic](#-monitoramento-contínuo-com-new-relic)
+6.  [📋 Pré-requisitos](#-pré-requisitos)
+7.  [📂 Estrutura do Repositório](#-estrutura-do-repositório)
+8.  [⚙️ Configuração Inicial](#️-configuração-inicial)
+9.  [▶️ Como Executar a API](#️-como-executar-a-api)
+10. [🔗 Endpoints Principais](#-endpoints-principais)
+11. [✅ Testes Unitários](#-testes-unitários)
+12. [🤝 Contribuindo](#-contribuindo)
+13. [📄 Licença](#-licença)
 
 ---
 
@@ -117,7 +104,7 @@ Com o New Relic, obtemos visibilidade completa sobre:
 * **Métricas de Banco de Dados**: Identificação de queries lentas ou problemáticas.
 * **Logs Centralizados**: Agregação dos logs da aplicação para facilitar a depuração.
 
-![Dashboard de Exemplo no New Relic]((image-3.png)
+![Dashboard do New Relic](./image-3.png)
 
 ---
 
