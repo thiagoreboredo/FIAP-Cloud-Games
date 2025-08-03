@@ -120,4 +120,16 @@ app.UseCorrelationMiddleware();
 app.UseGlobalErrorHandlingMiddleware();
 #endregion
 
+app.MapGet("/debug/env", () => new
+{
+    DD_API_KEY = Environment.GetEnvironmentVariable("DD_API_KEY")?.Length > 0 ? "***CONFIGURADO***" : "NÃO ENCONTRADO",
+    DD_ENV = Environment.GetEnvironmentVariable("DD_ENV"),
+    DD_SERVICE = Environment.GetEnvironmentVariable("DD_SERVICE"),
+    DD_SITE = Environment.GetEnvironmentVariable("DD_SITE"),
+    DD_TRACE_ENABLED = Environment.GetEnvironmentVariable("DD_TRACE_ENABLED"),
+    DD_DOTNET_TRACER_HOME = Environment.GetEnvironmentVariable("DD_DOTNET_TRACER_HOME"),
+    CORECLR_ENABLE_PROFILING = Environment.GetEnvironmentVariable("CORECLR_ENABLE_PROFILING"),
+    CORECLR_PROFILER = Environment.GetEnvironmentVariable("CORECLR_PROFILER")
+});
+
 app.Run();
