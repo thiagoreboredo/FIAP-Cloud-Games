@@ -31,30 +31,21 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 
 # Instalar curl e baixar o Datadog Tracer
-RUN apt-get update && apt-get install -y curl unzip && \
+RUN apt-get update && apt-get install -y curl && \
     mkdir -p /opt/datadog && \
-    curl -L -o datadog-tracer.zip https://github.com/DataDog/dd-trace-dotnet/releases/download/v2.53.0/datadog-dotnet-apm-2.53.0.tar.gz && \
-    tar -xzf datadog-tracer.zip -C /opt/datadog && \
-    rm datadog-tracer.zip && \
+    curl -LO https://github.com/DataDog/dd-trace-dotnet/releases/download/v3.22.0/datadog-dotnet-apm-3.22.0.tar.gz && \
+    tar -xzf datadog-dotnet-apm-3.22.0.tar.gz -C /opt/datadog && \
+    rm datadog-dotnet-apm-3.22.0.tar.gz && \
+    # Limpar cache do apt
     rm -rf /var/lib/apt/lists/*
 
 # Copia os arquivos publicados
 COPY --from=publish /app/publish .
 
-# Configurações do Datadog
-ENV DD_TRACE_ENABLED=true
-ENV DD_SERVICE=api-fiap-cloud-games
-ENV DD_VERSION=1.0.0
-ENV DD_ENV=production
+# Configurações básicas do Datadog (NÃO sobrescrever as do Azure)
 ENV DD_DOTNET_TRACER_HOME=/opt/datadog
-ENV CORECLR_ENABLE_PROFILING=1
-ENV CORECLR_PROFILER={846F5F1C-F9AE-4B07-969E-05C26BC060D8}
 ENV CORECLR_PROFILER_PATH=/opt/datadog/Datadog.Trace.ClrProfiler.Native.so
 ENV DD_INTEGRATIONS=/opt/datadog/integrations.json
-ENV DD_LOGS_INJECTION=true
-ENV DD_TRACE_STARTUP_LOGS=true
-ENV DD_TRACE_DEBUG=true
-ENV DD_TRACE_LOG_LEVEL=Debug
 
 # Define o ponto de entrada
 ENTRYPOINT ["dotnet", "FIAP-Cloud-Games.dll"]
