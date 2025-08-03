@@ -1,6 +1,8 @@
 using Application.Helper;
 using Application.Mapping;
 using Application.Services;
+using Datadog.Trace;
+using Datadog.Trace.Configuration;
 using Domain.Repository;
 using FIAP_Cloud_Games.Configurations;
 using FIAP_Cloud_Games.Endpoints;
@@ -15,6 +17,16 @@ using System.Text;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+
+if (Environment.GetEnvironmentVariable("DD_TRACE_ENABLED") == "true")
+{
+    Tracer.Configure(new TracerSettings
+    {
+        Environment = Environment.GetEnvironmentVariable("DD_ENV") ?? "production",
+        ServiceName = Environment.GetEnvironmentVariable("DD_SERVICE") ?? "api-fiap-cloud-games",
+        ServiceVersion = Environment.GetEnvironmentVariable("DD_VERSION") ?? "1.0.0"
+    });
+}
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -120,16 +132,25 @@ app.UseCorrelationMiddleware();
 app.UseGlobalErrorHandlingMiddleware();
 #endregion
 
-app.MapGet("/debug/env", () => new
+app.MapGet("/debug/datadog", () => new
 {
     DD_API_KEY = Environment.GetEnvironmentVariable("DD_API_KEY")?.Length > 0 ? "***CONFIGURADO***" : "NÃO ENCONTRADO",
     DD_ENV = Environment.GetEnvironmentVariable("DD_ENV"),
     DD_SERVICE = Environment.GetEnvironmentVariable("DD_SERVICE"),
     DD_SITE = Environment.GetEnvironmentVariable("DD_SITE"),
+    DD_VERSION = Environment.GetEnvironmentVariable("DD_VERSION"),
     DD_TRACE_ENABLED = Environment.GetEnvironmentVariable("DD_TRACE_ENABLED"),
     DD_DOTNET_TRACER_HOME = Environment.GetEnvironmentVariable("DD_DOTNET_TRACER_HOME"),
+    DD_LOGS_INJECTION = Environment.GetEnvironmentVariable("DD_LOGS_INJECTION"),
+    DD_TRACE_STARTUP_LOGS = Environment.GetEnvironmentVariable("DD_TRACE_STARTUP_LOGS"),
+    DD_TRACE_LOG_LEVEL = Environment.GetEnvironmentVariable("DD_TRACE_LOG_LEVEL"),
+    DD_TRACE_DEBUG = Environment.GetEnvironmentVariable("DD_TRACE_DEBUG"),
     CORECLR_ENABLE_PROFILING = Environment.GetEnvironmentVariable("CORECLR_ENABLE_PROFILING"),
-    CORECLR_PROFILER = Environment.GetEnvironmentVariable("CORECLR_PROFILER")
+    CORECLR_PROFILER = Environment.GetEnvironmentVariable("CORECLR_PROFILER"),
+    CORECLR_PROFILER_PATH = Environment.GetEnvironmentVariable("CORECLR_PROFILER_PATH"),
+    DD_INTEGRATIONS = Environment.GetEnvironmentVariable("DD_INTEGRATIONS"),
+    TracerEnabled = Tracer.Instance.Settings.TraceEnabled,
+    ServiceName = Tracer.Instance.DefaultServiceName
 });
 
 app.Run();

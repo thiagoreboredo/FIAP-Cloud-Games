@@ -41,10 +41,20 @@ RUN apt-get update && apt-get install -y curl unzip && \
 # Copia os arquivos publicados
 COPY --from=publish /app/publish .
 
-# Configurações básicas do Datadog
+# Configurações do Datadog
 ENV DD_TRACE_ENABLED=true
-ENV DD_SERVICE=fiap-cloud-games-api
+ENV DD_SERVICE=api-fiap-cloud-games
 ENV DD_VERSION=1.0.0
+ENV DD_ENV=production
+ENV DD_DOTNET_TRACER_HOME=/opt/datadog
+ENV CORECLR_ENABLE_PROFILING=1
+ENV CORECLR_PROFILER={846F5F1C-F9AE-4B07-969E-05C26BC060D8}
+ENV CORECLR_PROFILER_PATH=/opt/datadog/Datadog.Trace.ClrProfiler.Native.so
+ENV DD_INTEGRATIONS=/opt/datadog/integrations.json
+ENV DD_LOGS_INJECTION=true
+ENV DD_TRACE_STARTUP_LOGS=true
+ENV DD_TRACE_DEBUG=true
+ENV DD_TRACE_LOG_LEVEL=Debug
 
 # Define o ponto de entrada
 ENTRYPOINT ["dotnet", "FIAP-Cloud-Games.dll"]
