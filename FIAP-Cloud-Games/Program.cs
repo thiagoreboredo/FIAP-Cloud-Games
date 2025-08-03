@@ -120,28 +120,4 @@ app.UseCorrelationMiddleware();
 app.UseGlobalErrorHandlingMiddleware();
 #endregion
 
-app.MapGet("/debug/datadog", () => new
-{
-    // Variáveis de ambiente do DataDog
-    DD_API_KEY = Environment.GetEnvironmentVariable("DD_API_KEY")?.Length > 0 ? "***CONFIGURADO***" : "NÃO ENCONTRADO",
-    DD_TRACE_ENABLED = Environment.GetEnvironmentVariable("DD_TRACE_ENABLED"),
-    DD_SERVICE = Environment.GetEnvironmentVariable("DD_SERVICE"),
-    DD_ENV = Environment.GetEnvironmentVariable("DD_ENV"),
-    DD_SITE = Environment.GetEnvironmentVariable("DD_SITE"),
-
-    // Status do .NET
-    Environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"),
-    ProcessId = Environment.ProcessId,
-    MachineName = Environment.MachineName,
-
-    // DataDog Assembly Info
-    DatadogAssemblyLoaded = AppDomain.CurrentDomain.GetAssemblies()
-        .Any(a => a.FullName?.Contains("Datadog") == true),
-
-    LoadedAssemblies = AppDomain.CurrentDomain.GetAssemblies()
-        .Where(a => a.FullName?.Contains("Datadog") == true)
-        .Select(a => a.FullName)
-        .ToArray()
-});
-
 app.Run();
