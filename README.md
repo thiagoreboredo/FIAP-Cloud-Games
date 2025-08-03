@@ -10,27 +10,28 @@ API RESTful para gerenciar usuários e biblioteca de jogos digitais, desenvolvid
 2. [🖼️ Visão Geral do Projeto](#visão-geral-do-projeto)
 3. [📈 Diagrama de Estrutura](#diagrama-de-estrutura)
 4. [🛠️ Tecnologias](#tecnologias)
-5. [📋 Pré-requisitos](#pré-requisitos)
-6. [📂 Estrutura do Repositório](#estrutura-do-repositório)
-7. [⚙️ Configuração Inicial](#configuração-inicial)
+5. [📡 Monitoramento Contínuo com New Relic](#monitoramento)
+6. [📋 Pré-requisitos](#pré-requisitos)
+7. [📂 Estrutura do Repositório](#estrutura-do-repositório)
+8. [⚙️ Configuração Inicial](#configuração-inicial)
 
    - [1. Clonar o Repositório](#1-clonar-o-repositório)
    - [2. Ajustar Strings de Conexão](#2-ajustar-strings-de-conexão)
 
-8. [▶️ Como Executar a API](#como-executar-a-api)
+9. [▶️ Como Executar a API](#como-executar-a-api)
 
    - [🔍 Acesse o Swagger](#acesse-o-swagger)
 
-9. [🔗 Endpoints Principais](#endpoints-principais)
+10. [🔗 Endpoints Principais](#endpoints-principais)
 
    - [🔑 Autenticação](#autenticação)
    - [👤 Usuários](#usuários)
    - [🎮 Jogos](#jogos)
    - [📚 Biblioteca de Jogos](#biblioteca-de-jogos)
 
-10. [✅ Testes Unitários](#testes-unitários)
-11. [🤝 Contribuindo](#contribuindo)
-12. [📄 Licença](#licença)
+11. [✅ Testes Unitários](#testes-unitários)
+12. [🤝 Contribuindo](#contribuindo)
+13. [📄 Licença](#licença)
 
 ---
 
@@ -70,6 +71,7 @@ O FIAP Cloud Games é um MVP que permite:
 2. Autenticar-se via token JWT.
 3. Listar, criar, editar e remover jogos (restrito a administradores), com armazenamento no PostgreSQL.
 4. Consultar catálogo de jogos por qualquer usuário.
+5. Monitorar a performance e a saúde da aplicação em tempo real.
 
 Toda a lógica de persistência está isolada em projetos de **Application** e **Infrastructure**, seguindo boas práticas de Clean Architecture e SOLID, utilizando Entity Framework Core com provedor PostgreSQL.
 
@@ -87,7 +89,7 @@ Toda a lógica de persistência está isolada em projetos de **Application** e *
 
 <p align="">
   <a href="https://skillicons.dev">
-    <img src="https://skillicons.dev/icons?i=cs,dotnet,postgres,git,github" />
+    <img src="https://skillicons.dev/icons?i=cs,dotnet,azure,docker,git,github,postgres" />
   </a>
 </p>
 
@@ -98,6 +100,24 @@ Toda a lógica de persistência está isolada em projetos de **Application** e *
 - **Testes**: xUnit
 - **Documentação**: Swagger UI
 - **Versionamento**: GitHub (Git flow)
+- **Conteinerização e CI/CD**: Docker, Azure DevOps
+- **Monitoramento**: New Relic (APM)
+
+---
+
+## 📡 Monitoramento Contínuo com New Relic
+
+Para garantir a alta performance e a confiabilidade da nossa API, o projeto foi instrumentado com o **New Relic APM (Application Performance Monitoring)**.
+
+A integração foi feita diretamente no `Dockerfile`, instalando o agente do New Relic na imagem final da aplicação. As configurações sensíveis, como a chave de licença (`NEW_RELIC_LICENSE_KEY`) e o nome da aplicação (`NEW_RELIC_APP_NAME`), são gerenciadas de forma segura através de variáveis de ambiente, injetadas pelo serviço de hospedagem (Azure Container Apps), mantendo o código-fonte limpo de segredos.
+
+Com o New Relic, obtemos visibilidade completa sobre:
+* **Performance das Transações**: Tempo de resposta de cada endpoint da API.
+* **Diagnóstico de Erros**: Rastreamento e análise de exceções em tempo real.
+* **Métricas de Banco de Dados**: Identificação de queries lentas ou problemáticas.
+* **Logs Centralizados**: Agregação dos logs da aplicação para facilitar a depuração.
+
+![Dashboard de Exemplo no New Relic]((image-3.png)
 
 ---
 
