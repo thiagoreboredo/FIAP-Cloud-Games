@@ -18,16 +18,6 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-if (Environment.GetEnvironmentVariable("DD_TRACE_ENABLED") == "true")
-{
-    Tracer.Configure(new TracerSettings
-    {
-        Environment = Environment.GetEnvironmentVariable("DD_ENV") ?? "production",
-        ServiceName = Environment.GetEnvironmentVariable("DD_SERVICE") ?? "api-fiap-cloud-games",
-        ServiceVersion = Environment.GetEnvironmentVariable("DD_VERSION") ?? "1.0.0"
-    });
-}
-
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -150,7 +140,14 @@ app.MapGet("/debug/datadog", () => new
     CORECLR_PROFILER_PATH = Environment.GetEnvironmentVariable("CORECLR_PROFILER_PATH"),
     DD_INTEGRATIONS = Environment.GetEnvironmentVariable("DD_INTEGRATIONS"),
     TracerEnabled = Tracer.Instance.Settings.TraceEnabled,
-    ServiceName = Tracer.Instance.DefaultServiceName
+    ServiceName = Tracer.Instance.DefaultServiceName,
+    IsTracerActive = Tracer.Instance.ActiveScope != null,
+    TracerSettings = new
+    {
+        Environment = Tracer.Instance.Settings.Environment,
+        ServiceName = Tracer.Instance.Settings.ServiceName,
+        ServiceVersion = Tracer.Instance.Settings.ServiceVersion
+    }
 });
 
 app.Run();
