@@ -1,8 +1,6 @@
 using Application.Helper;
 using Application.Mapping;
 using Application.Services;
-using Datadog.Trace;
-using Datadog.Trace.Configuration;
 using Domain.Repository;
 using FIAP_Cloud_Games.Configurations;
 using FIAP_Cloud_Games.Endpoints;
@@ -124,30 +122,26 @@ app.UseGlobalErrorHandlingMiddleware();
 
 app.MapGet("/debug/datadog", () => new
 {
+    // Variáveis de ambiente do DataDog
     DD_API_KEY = Environment.GetEnvironmentVariable("DD_API_KEY")?.Length > 0 ? "***CONFIGURADO***" : "NÃO ENCONTRADO",
-    DD_ENV = Environment.GetEnvironmentVariable("DD_ENV"),
-    DD_SERVICE = Environment.GetEnvironmentVariable("DD_SERVICE"),
-    DD_SITE = Environment.GetEnvironmentVariable("DD_SITE"),
-    DD_VERSION = Environment.GetEnvironmentVariable("DD_VERSION"),
     DD_TRACE_ENABLED = Environment.GetEnvironmentVariable("DD_TRACE_ENABLED"),
-    DD_DOTNET_TRACER_HOME = Environment.GetEnvironmentVariable("DD_DOTNET_TRACER_HOME"),
-    DD_LOGS_INJECTION = Environment.GetEnvironmentVariable("DD_LOGS_INJECTION"),
-    DD_TRACE_STARTUP_LOGS = Environment.GetEnvironmentVariable("DD_TRACE_STARTUP_LOGS"),
-    DD_TRACE_LOG_LEVEL = Environment.GetEnvironmentVariable("DD_TRACE_LOG_LEVEL"),
-    DD_TRACE_DEBUG = Environment.GetEnvironmentVariable("DD_TRACE_DEBUG"),
-    CORECLR_ENABLE_PROFILING = Environment.GetEnvironmentVariable("CORECLR_ENABLE_PROFILING"),
-    CORECLR_PROFILER = Environment.GetEnvironmentVariable("CORECLR_PROFILER"),
-    CORECLR_PROFILER_PATH = Environment.GetEnvironmentVariable("CORECLR_PROFILER_PATH"),
-    DD_INTEGRATIONS = Environment.GetEnvironmentVariable("DD_INTEGRATIONS"),
-    TracerEnabled = Tracer.Instance.Settings.TraceEnabled,
-    ServiceName = Tracer.Instance.DefaultServiceName,
-    IsTracerActive = Tracer.Instance.ActiveScope != null,
-    TracerSettings = new
-    {
-        Environment = Tracer.Instance.Settings.Environment,
-        ServiceName = Tracer.Instance.Settings.ServiceName,
-        ServiceVersion = Tracer.Instance.Settings.ServiceVersion
-    }
+    DD_SERVICE = Environment.GetEnvironmentVariable("DD_SERVICE"),
+    DD_ENV = Environment.GetEnvironmentVariable("DD_ENV"),
+    DD_SITE = Environment.GetEnvironmentVariable("DD_SITE"),
+
+    // Status do .NET
+    Environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"),
+    ProcessId = Environment.ProcessId,
+    MachineName = Environment.MachineName,
+
+    // DataDog Assembly Info
+    DatadogAssemblyLoaded = AppDomain.CurrentDomain.GetAssemblies()
+        .Any(a => a.FullName?.Contains("Datadog") == true),
+
+    LoadedAssemblies = AppDomain.CurrentDomain.GetAssemblies()
+        .Where(a => a.FullName?.Contains("Datadog") == true)
+        .Select(a => a.FullName)
+        .ToArray()
 });
 
 app.Run();

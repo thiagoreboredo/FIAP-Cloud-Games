@@ -30,22 +30,11 @@ RUN dotnet publish "FIAP-Cloud-Games.csproj" -c Release -o /app/publish /p:UseAp
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 
-# Instalar curl e baixar o Datadog Tracer
-RUN apt-get update && apt-get install -y curl && \
-    mkdir -p /opt/datadog && \
-    curl -LO https://github.com/DataDog/dd-trace-dotnet/releases/download/v3.22.0/datadog-dotnet-apm-3.22.0.tar.gz && \
-    tar -xzf datadog-dotnet-apm-3.22.0.tar.gz -C /opt/datadog && \
-    rm datadog-dotnet-apm-3.22.0.tar.gz && \
-    # Limpar cache do apt
-    rm -rf /var/lib/apt/lists/*
-
 # Copia os arquivos publicados
 COPY --from=publish /app/publish .
 
-# Configurações básicas do Datadog (NÃO sobrescrever as do Azure)
-ENV DD_DOTNET_TRACER_HOME=/opt/datadog
-ENV CORECLR_PROFILER_PATH=/opt/datadog/Datadog.Trace.ClrProfiler.Native.so
-ENV DD_INTEGRATIONS=/opt/datadog/integrations.json
+# Ativar logs de debug da aplicação
+ENV ASPNETCORE_LOGGING__LOGLEVEL__DEFAULT=Debug
 
 # Define o ponto de entrada
 ENTRYPOINT ["dotnet", "FIAP-Cloud-Games.dll"]
