@@ -52,7 +52,6 @@ ENV DD_DOTNET_TRACER_HOME=/opt/datadog
 ENV DD_VERSION="1.0.0"
 ENV DD_SERVICE="fiap-cloud-games"
 ENV DD_ENV="prod"
-ENV DD_AGENT_HOST="localhost"
 ENV DD_APM_ENABLED=true
 
 # Define o ponto de entrada
