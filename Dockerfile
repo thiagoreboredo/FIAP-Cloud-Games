@@ -30,6 +30,14 @@ RUN dotnet publish "FIAP-Cloud-Games.csproj" -c Release -o /app/publish /p:UseAp
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 
+# Instalar curl e baixar o Datadog Tracer
+RUN apt-get update && apt-get install -y curl && \
+    mkdir -p /opt/datadog && \
+    curl -LO https://github.com/DataDog/dd-trace-dotnet/releases/latest/download/datadog-dotnet-apm_2.53.0_amd64.deb && \
+    dpkg -i ./datadog-dotnet-apm_2.53.0_amd64.deb && \
+    rm ./datadog-dotnet-apm_2.53.0_amd64.deb && \
+    rm -rf /var/lib/apt/lists/*
+
 # Copia os arquivos publicados
 COPY --from=publish /app/publish .
 
