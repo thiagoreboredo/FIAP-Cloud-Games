@@ -29,23 +29,20 @@ RUN dotnet publish "FIAP-Cloud-Games.csproj" -c Release -o /app/publish /p:UseAp
 # Estágio 3: Imagem Final
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 
-# ---- INÍCIO: Instalação do Agente New Relic (Método Oficial) ----
-# Instala as dependências para adicionar um novo repositório (curl, gnupg)
-RUN apt-get update && apt-get install -y --no-install-recommends curl gnupg && \
-    # Adiciona a chave de segurança GPG do New Relic
-    curl -sS https://download.newrelic.com/548C16BF.gpg | gpg --dearmor -o /usr/share/keyrings/newrelic-archive-keyring.gpg
-# Adiciona o repositório APT do New Relic na lista de fontes do sistema
-# A imagem base do .NET 8 usa Debian Bookworm
-RUN echo "deb [signed-by=/usr/share/keyrings/newrelic-archive-keyring.gpg] https://apt.newrelic.com/debian/ stable main" \
-    | tee /etc/apt/sources.list.d/newrelic-dotnet-agent.list
-# Atualiza a lista de pacotes e finalmente instala o agente .NET
-RUN apt-get update && apt-get install -y newrelic-dotnet-agent
-# Configura as variáveis de ambiente para ativar o profiler do New Relic
-ENV CORECLR_ENABLE_PROFILING=1
-ENV CORECLR_PROFILER={36032161-FFC0-4B61-B559-F6C5D41BAE5A}
-ENV CORE_PROFILER_PATH=/usr/local/newrelic-dotnet-agent/libNewRelicProfiler.so
-ENV NEW_RELIC_APP_NAME="FIAP-Cloud-Games-Azure"
-# ---- FIM: Instalação do Agente New Relic ----
+# Install the agent
+RUN apt-get update && apt-get install -y wget ca-certificates gnupg \
+&& echo 'deb http://apt.newrelic.com/debian/ newrelic non-free' | tee /etc/apt/sources.list.d/newrelic.list \
+&& wget https://download.newrelic.com/548C16BF.gpg \
+&& apt-key add 548C16BF.gpg \
+&& apt-get update \
+&& apt-get install -y 'newrelic-dotnet-agent' \
+&& rm -rf /var/lib/apt/lists/*
+
+# Enable the agent
+ENV CORECLR_ENABLE_PROFILING=1 \
+CORECLR_PROFILER={36032161-FFC0-4B61-B559-F6C5D41BAE5A} \
+CORECLR_NEWRELIC_HOME=/usr/local/newrelic-dotnet-agent \
+CORECLR_PROFILER_PATH=/usr/local/newrelic-dotnet-agent/libNewRelicProfiler.so \
 
 WORKDIR /app
 COPY --from=publish /app/publish .
