@@ -36,7 +36,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl gnupg && \
     curl -sS https://download.newrelic.com/548C16BF.gpg | gpg --dearmor -o /usr/share/keyrings/newrelic-archive-keyring.gpg
 # Adiciona o repositório APT do New Relic na lista de fontes do sistema
 # A imagem base do .NET 8 usa Debian Bookworm
-RUN echo "deb [signed-by=/usr/share/keyrings/newrelic-archive-keyring.gpg] https://apt.newrelic.com/debian/ bookworm main" \
+RUN echo "deb [signed-by=/usr/share/keyrings/newrelic-archive-keyring.gpg] https://apt.newrelic.com/debian/ stable main" \
     | tee /etc/apt/sources.list.d/newrelic-dotnet-agent.list
 # Atualiza a lista de pacotes e finalmente instala o agente .NET
 RUN apt-get update && apt-get install -y newrelic-dotnet-agent
