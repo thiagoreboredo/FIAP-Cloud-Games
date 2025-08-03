@@ -28,13 +28,27 @@ RUN dotnet publish "FIAP-Cloud-Games.csproj" -c Release -o /app/publish /p:UseAp
 
 # Estágio 3: Imagem Final
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+
+# ---- INÍCIO: Instalação do Agente New Relic (Método Oficial) ----
+# Instala as dependências para adicionar um novo repositório (curl, gnupg)
+RUN apt-get update && apt-get install -y --no-install-recommends curl gnupg && \
+    # Adiciona a chave de segurança GPG do New Relic
+    curl -sS https://download.newrelic.com/548C16BF.gpg | gpg --dearmor -o /usr/share/keyrings/newrelic-archive-keyring.gpg
+# Adiciona o repositório APT do New Relic na lista de fontes do sistema
+# A imagem base do .NET 8 usa Debian Bookworm
+RUN echo "deb [signed-by=/usr/share/keyrings/newrelic-archive-keyring.gpg] https://apt.newrelic.com/debian/ bookworm main" \
+    | tee /etc/apt/sources.list.d/newrelic-dotnet-agent.list
+# Atualiza a lista de pacotes e finalmente instala o agente .NET
+RUN apt-get update && apt-get install -y newrelic-dotnet-agent
+# Configura as variáveis de ambiente para ativar o profiler do New Relic
+ENV CORECLR_ENABLE_PROFILING=1
+ENV CORECLR_PROFILER={36032161-FFC0-4B61-B559-F6C5D41BAE5A}
+ENV CORE_PROFILER_PATH=/usr/local/newrelic-dotnet-agent/libNewRelicProfiler.so
+ENV NEW_RELIC_APP_NAME="FIAP-Cloud-Games-Azure"
+# ---- FIM: Instalação do Agente New Relic ----
+
 WORKDIR /app
-
-# Copia os arquivos publicados
 COPY --from=publish /app/publish .
-
-# Ativar logs de debug da aplicação
-ENV ASPNETCORE_LOGGING__LOGLEVEL__DEFAULT=Debug
 
 # Define o ponto de entrada
 ENTRYPOINT ["dotnet", "FIAP-Cloud-Games.dll"]
