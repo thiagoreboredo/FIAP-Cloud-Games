@@ -33,5 +33,10 @@ WORKDIR /app
 # Copia os arquivos publicados
 COPY --from=publish /app/publish .
 
+# Configurações básicas do Datadog
+ENV DD_TRACE_ENABLED=true
+ENV DD_SERVICE=fiap-cloud-games-api
+ENV DD_VERSION=1.0.0
+
 # Define o ponto de entrada
 ENTRYPOINT ["dotnet", "FIAP-Cloud-Games.dll"]

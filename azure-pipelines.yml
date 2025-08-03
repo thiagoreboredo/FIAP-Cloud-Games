@@ -63,3 +63,9 @@ stages:
         resourceGroup: '$(resourceGroup)'
         containerAppName: '$(containerAppName)'
         imageToDeploy: '$(acrLoginServer)/$(imageRepository):$(tag)'
+        environmentVariables: |
+          DD_API_KEY=$(DatadogApiKey)
+          DD_SITE=datadoghq.com
+          DD_ENV=production
+          DD_SERVICE=fiap-cloud-games-api
+          DD_VERSION=$(tag)
